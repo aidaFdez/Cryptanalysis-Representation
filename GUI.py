@@ -48,12 +48,12 @@ Label(text = "x", relief=RIDGE, width=10).grid(row = 9, column=0)
 
 Label(text = "S[x]", relief=RIDGE, width=10).grid(row = 10, column=0)
 
-for i in range(1,18):
+for i in range(1,17):
     Label(text = i-1, relief=RIDGE, width=10).grid(row = 9, column=i)
     Entry(width = 10).grid(row = 10, column=i)
     """cell.grid(row =0,column= i)
 for i in range(0,17):
-    ent = Entry(table, text="") 
+    ent = Entry(table, text="")
     ent.grid(row = 1, column = i)
 #table.pack()"""
 
