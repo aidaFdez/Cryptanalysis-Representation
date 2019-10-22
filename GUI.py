@@ -35,13 +35,11 @@ entry_titles = []
 def createSbox(self):
     j = 0
     #delete all of previous ones
-    for et in entry_titles:
+    for et in entry_titles[:]:
         et.grid_forget()
-    for et in entry_titles:
         entry_titles.remove(et)
-    for en in entries:
+    for en in entries[:]:
         en.grid_forget()
-    for en in entries:
         entries.remove(en)
 
     while j<boxes.get():
