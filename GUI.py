@@ -31,26 +31,14 @@ bitpopupMenu.grid(row = 6, column = 0)
 sbox = []
 entries = []
 entry_titles = []
-
-def createSbox(self):
-    j = 0
-    #delete all of previous ones
-    for et in entry_titles[:]:
-        et.grid_forget()
-        entry_titles.remove(et)
-    for en in entries[:]:
-        en.grid_forget()
-        entries.remove(en)
-
-    while j<boxes.get():
-        for i in range(1,17):
-            et = Label(text = i-1, relief=RIDGE, width=10)
-            et.grid(row = 9+(2*j), column=i)
-            entry_titles.append(et)
-            ent = Entry(width = 10)
-            ent.grid(row = 10+(2*j), column=i)
-            entries.append(ent)
-        j +=1
+    #while j<boxes.get():
+for i in range(1,17):
+    Label(text = i-1, relief=RIDGE, width=10).grid(row = 9, column=i)
+    #entry_titles.append(et)
+    ent = Entry(width = 10)
+    ent.grid(row = 10, column=i)
+    entries.append(ent)
+    #j +=1
     """cell.grid(row =0,column= i)
 for i in range(0,17):
     ent = Entry(table, text="")
@@ -59,7 +47,7 @@ for i in range(0,17):
 
 boxes = IntVar(window)
 box_choices = (2,2,3,4,5)
-boxpopupMenu = OptionMenu(window, boxes, *box_choices, command = createSbox)
+boxpopupMenu = OptionMenu(window, boxes, *box_choices)
 Label(window, text="Choose the number of S-boxes").grid(row = 7, column=0)
 boxpopupMenu.grid(row = 8, column = 0)
 
