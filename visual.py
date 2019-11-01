@@ -4,6 +4,8 @@ window =tk.Tk()
 window.title("Visualisation")
 #window.resizable(height = True, width =True)
 #window.geometry('300x400')
+scrollbar = tk.Scrollbar(window)
+scrollbar.pack(side = tk.RIGHT, fill = tk.Y)
 
 inputString = "aa"
 numOfBits = 8
@@ -39,7 +41,7 @@ input_frame.pack()
 input_label = tk.Label(input_frame, text="Input = "+ inputString)
 input_label.pack()
 
-arrow1_canvas = tk.Canvas()
+arrow1_canvas = tk.Canvas(yscrollcommand = scrollbar.set)
 arrow1_canvas.pack(fill=tk.BOTH, expand = 1)
 
 # height = window.winfo_height()
@@ -53,5 +55,5 @@ arrow1_canvas.pack(fill=tk.BOTH, expand = 1)
                             #self.rand_func(a, b, c)
 #https://stackoverflow.com/questions/7299955/tkinter-binding-a-function-with-arguments-to-a-widget
 arrow1_canvas.bind("<Configure>", lambda event, num_arrows = sBoxes, num_rounds=numOfRounds: configure(event,sBoxes, numOfRounds))
-
+scrollbar.config(command=arrow1_canvas.yview)
 window.mainloop()
