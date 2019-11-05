@@ -26,6 +26,8 @@ def configure(event, num_arrows, num_rounds):
     arrow1_canvas.create_oval(width/2-20, end_arrow+25, width/2+20, end_arrow+65)
     arrow1_canvas.create_line(width/2-20,end_arrow+45 , width/2+20, end_arrow+45)
     arrow1_canvas.create_line(width/2,end_arrow+25 , width/2, end_arrow+65)
+    arrow1_canvas.create_line((width/10)-15,end_arrow+45, (width/10),end_arrow+45,arrow=tk.LAST)
+    arrow1_canvas.create_text((width/10)-20, end_arrow+45, text="k0")
 
     for r in range(num_rounds):
         for a in range(num_arrows):
@@ -33,6 +35,15 @@ def configure(event, num_arrows, num_rounds):
             arrow1_canvas.create_line(width/(num_arrows+1)*(a+1),(r+1)*end_arrow+75, width/(num_arrows+1)*(a+1),(r+1)*end_arrow+105,arrow=tk.LAST)
             arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, (r+1)*end_arrow+105, width/(num_arrows+1)*(a+1)+25, (r+1)*end_arrow+155)
             arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), (r+1)*end_arrow+130, text="S")
+            arrow1_canvas.create_line(width/(num_arrows+1)*(a+1),(r+1)*end_arrow+155, width/(num_arrows+1)*(a+1),(r+1)*end_arrow+180,arrow=tk.LAST)
+        arrow1_canvas.create_rectangle((width/10), (r+1)*end_arrow+180, (width-width/10), (r+1)*end_arrow+225)
+        if (r != num_rounds-1) :
+            arrow1_canvas.create_oval(width/2-15, (r+1)*end_arrow+185, width/2+15, (r+1)*end_arrow+215)
+            arrow1_canvas.create_line(width/2-15,(r+1)*end_arrow+200 , width/2+15, (r+1)*end_arrow+200)
+            arrow1_canvas.create_line(width/2,(r+1)*end_arrow+185 , width/2, (r+1)*end_arrow+215)
+            arrow1_canvas.create_line((width/10)-15,(r+1)*end_arrow+200, (width/10),(r+1)*end_arrow+200,arrow=tk.LAST)
+            arrow1_canvas.create_text((width/10)-20, (r+1)*end_arrow+200, text="k"+str(r+1))
+
 
 
 
