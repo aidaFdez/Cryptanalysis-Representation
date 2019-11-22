@@ -20,13 +20,10 @@ popupMenu = OptionMenu(window,rounds, *choices)
 Label(window, text="Choose the number of rounds").grid(row = 3, column=0)
 popupMenu.grid(row = 4, column = 0)
 
-#choosing number of bits
-inStr = StringVar()
+#Getting the input
 Label(window, text="Write input").grid(row = 5, column=0)
-input = Entry(width = 10)
+input = Entry(window, width = 10)
 input.grid(row = 6, column=0)
-inputString = input.get()
-print(inputString)
 
 #choosing number of S-box
 
@@ -111,11 +108,14 @@ def printSbox():
 
 
 def create():
+    #Get the input string
+    inputString = input.get()
+    #Get the pBox
     send = []
     for en in pBox:
         send.append(int(en.get()))
     print(inputString)
-    visual.visual(inputString, len(inputString), rounds.get(), boxes.get(), entries,send)
+    visual.visual(inputString, len(inputString), rounds.get(), boxes.get(), entries, send, type)
 
 generateButton = Button(window, text = "Generate", command = create)
 generateButton.grid(row = 14, column = 0)
