@@ -18,9 +18,29 @@ ddft = [[16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,2,0,4,2,0,0,0,0,0,2,0,0,0,0,6],
         [0,0,0,0,2,0,2,0,0,0,0,0,0,10,0,2]]
 
+def showDdft(wn):
+    ddftWnw = tk.Toplevel(wn)
+    fr = tk.Frame(ddftWnw)
+    fr.pack()
+    for i in range(16):
+        row = tk.Label(fr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
+        row.grid(row = 0, column = i+1)
+        col = tk.Label(fr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
+        col.grid(row = i+1, column = 0)
+        for j in range(16):
+            prob = tk.Label(fr,text =ddft[i][j], relief=tk.RIDGE, width=10)
+            prob.grid(row = i+1, column = j+1)
+            #print(ddft[i][j])
+
 
 def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
+
+    wdw =tk.Tk()
     print(inputString)
+
+    if(type == "Differential"):
+        bt = tk.Button(wdw, text = "Difference distribution table", command = lambda: showDdft(wdw))
+        bt.pack()
 
     """def __init__(self,inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox):
         self.inputString = inputString
@@ -29,11 +49,10 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
         self.sBoxes = sBoxes
         self.sBox = sBox
         self.pBox = pBox"""
-    window =tk.Tk()
-    window.title("Visualisation")
-#window.resizable(height = True, width =True)
-#window.geometry('300x400')
-    scrollbar = tk.Scrollbar(window)
+    wdw.title("Visualisation")
+#wdw.resizable(height = True, width =True)
+#wdw.geometry('300x400')
+    scrollbar = tk.Scrollbar(wdw)
     scrollbar.pack(side = tk.RIGHT, fill = tk.Y)
 
 #inputString = "aa"
@@ -47,8 +66,8 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
     def configure(event, num_arrows, num_rounds):
         end_arrow= 150
         arrow1_canvas.delete("all")
-        height = window.winfo_height()
-        width = window.winfo_width()
+        height = wdw.winfo_height()
+        width = wdw.winfo_width()
         length_box =(width-width/5)
     #input
         arrow1_canvas.create_text(width/2, 20, text=inputString)
@@ -134,16 +153,16 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 arrow1_canvas.create_text(width/2, end_arrow+50, text="Output")
                 end_y = (r+1)*end_arrow+200
                 #arrow1_canvas.create_line(width/2,end_y, (width/10),width/2, end_y + 40,arrow=tk.LAST)
-                        #input_frame = tk.Frame(width=768, height=576,bg="", master = window, colormap="new")
+                        #input_frame = tk.Frame(width=768, height=576,bg="", master = wdw, colormap="new")
                         #input_frame.pack()
                         #input_label = tk.Label(input_frame, text="Input = "+ inputString)
                         #input_label.pack()
 
-    arrow1_canvas = tk.Canvas(window, yscrollcommand = scrollbar.set, scrollregion=(0,0,(numOfRounds+1)*300, (numOfRounds+1)*300))
+    arrow1_canvas = tk.Canvas(wdw, yscrollcommand = scrollbar.set, scrollregion=(0,0,(numOfRounds+1)*300, (numOfRounds+1)*300))
     arrow1_canvas.pack(fill=tk.BOTH, expand = 1)
 
-                        # height = window.winfo_height()
-                        # width = window.winfo_width()
+                        # height = wdw.winfo_height()
+                        # width = wdw.winfo_width()
                         # print(height)
                         # print(width)
 
@@ -154,4 +173,4 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                             #https://stackoverflow.com/questions/7299955/tkinter-binding-a-function-with-arguments-to-a-wid
     arrow1_canvas.bind("<Configure>", lambda event, num_arrows = sBoxes, num_rounds=numOfRounds: configure(event,sBoxes, numOfRounds))
     scrollbar.config(command=arrow1_canvas.yview)
-    window.mainloop()
+    wdw.mainloop()

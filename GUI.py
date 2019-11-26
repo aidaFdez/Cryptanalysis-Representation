@@ -8,8 +8,9 @@ window.title("Cryptanalysis")
 #GUI for choosing the kind of cryptanalysis
 messKind = Label(window, text="Choose the kind of cryptanalysis")
 messKind.grid(column = 0, row  = 0)
-linear = Radiobutton(window, text ="Linear", value = 1)
-differential = Radiobutton(window, text ="Differential", value = 2)
+type = StringVar()
+linear = Radiobutton(window, text ="Linear", value = "Linear", variable = type)
+differential = Radiobutton(window, text ="Differential", value = "Differential", variable = type)
 differential.grid(column = 0, row = 1)
 linear.grid(column = 0, row = 2)
 
@@ -114,8 +115,8 @@ def create():
     send = []
     for en in pBox:
         send.append(int(en.get()))
-    print(inputString)
-    visual.visual(inputString, len(inputString), rounds.get(), boxes.get(), entries, send, type)
+    print(type.get())
+    visual.visual(inputString, len(inputString), rounds.get(), boxes.get(), entries, send, type.get())
 
 generateButton = Button(window, text = "Generate", command = create)
 generateButton.grid(row = 14, column = 0)
