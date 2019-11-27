@@ -49,6 +49,19 @@ def showDdft(wn):
             prob.grid(row = i+1, column = j+1)
             #print(ddft[i][j])
 
+def showLAT(wn):
+    lanWnw = tk.Toplevel(wn)
+    lanfr = tk.Fram(lanWnw)
+    lanWnw.pack()
+    for i in range(16):
+        row = tk.Label(lanfr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
+        row.grid(row = 0, column = i+1)
+        col = tk.Label(lanfr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
+        col.grid(row = i+1, column = 0)
+        for j in range(16):
+            prob = tk.Label(lanfr,text =ddft[i][j], relief=tk.RIDGE, width=10)
+            prob.grid(row = i+1, column = j+1)
+
 
 def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
 
@@ -66,6 +79,10 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
         self.sBoxes = sBoxes
         self.sBox = sBox
         self.pBox = pBox"""
+    if(type == "Linear"):
+        bt = tk.Button(wdw, text = "Linear Approximation table", command = lambda: showDdft(wdw))
+        bt.pack() 
+    
     wdw.title("Visualisation")
 #wdw.resizable(height = True, width =True)
 #wdw.geometry('300x400')
