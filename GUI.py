@@ -3,6 +3,16 @@ from tkinter.ttk import *
 import visual
 import sys
 
+
+if __name__ == '__main__':
+    print("ENTERED")
+    #Pass the differential values automatically, no need to input them everytime.
+    if len(sys.argv)>1:
+        if sys.argv[1] == "diff":
+            sBox = [6,4,12,5,0,7,2,14,1,15,3,13,8,10,9,11]
+            pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
+            visual.visual("aa", 2, 2, 4, sBox, pBox, "Differential")
+
 window =Tk()
 window.title("Cryptanalysis")
 
@@ -128,10 +138,3 @@ generateButton = Button(window, text = "Generate", command = create)
 generateButton.grid(row = 14, column = 0)
 
 window.mainloop()
-
-if __name__ == '__main__':
-    print("ENTERED")
-    if sys.argv[1] == "diff":
-        sBox = [6,4,12,5,0,7,2,14,1,15,3,13,8,10,9,11]
-        pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
-        visual.visual("aa", 2, 2, 4, sBox, pBox, "Differential")
