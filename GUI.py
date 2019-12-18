@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter.ttk import *
 import visual
+import sys
 
 window =Tk()
 window.title("Cryptanalysis")
@@ -37,7 +38,7 @@ for i in range(1,17):
     #entry_titles.append(et)
     ent = Entry(width = 10)
     ent.grid(row = 10, column=i)
-    entries.append(ent.get())
+    entries.append(ent)
     #j +=1
     """cell.grid(row =0,column= i)
 for i in range(0,17):
@@ -115,10 +116,22 @@ def create():
     send = []
     for en in pBox:
         send.append(int(en.get()))
+    #Get the sbox
+    sbox = []
+    for en in entries:
+        sbox.append(int(en.get()))
+
     print(type.get())
-    visual.visual(inputString, len(inputString), rounds.get(), boxes.get(), entries, send, type.get())
+    visual.visual(inputString, len(inputString), rounds.get(), boxes.get(), sbox, send, type.get())
 
 generateButton = Button(window, text = "Generate", command = create)
 generateButton.grid(row = 14, column = 0)
 
 window.mainloop()
+
+if __name__ == '__main__':
+    print("ENTERED")
+    if sys.argv[1] == "diff":
+        sBox = [6,4,12,5,0,7,2,14,1,15,3,13,8,10,9,11]
+        pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
+        visual.visual("aa", 2, 2, 4, sBox, pBox, "Differential")

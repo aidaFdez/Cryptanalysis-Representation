@@ -1,9 +1,10 @@
 import tkinter as tk
+import diff
 
 #Difference distribution table hardcoded
 ddft = [[16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,6,0,0,0,0,2,0,2,0,0,2,0,4,0],
-        [0,6,6,0,0,0,0,0,0,0,2,2,0,0,0,0],
+        [0,6,6,0,0,0,0,0,0,2,2,0,0,0,0,0],
         [0,0,0,6,0,2,0,0,2,0,0,0,4,0,2,0],
         [0,0,0,2,0,2,4,0,0,2,2,2,0,0,2,0],
         [0,2,2,0,4,0,0,4,2,0,0,2,0,0,0,0],
@@ -35,18 +36,21 @@ lat = [[16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,10,6,0,0,10,10,4,6,0,0,10,6,0,4,6],
         [0,4,10,10,4,0,6,6,0,0,6,10,0,0,6,10]]
 
-def showDdft(wn):
+def showDdft(wn, sbox):
     ddftWnw = tk.Toplevel(wn)
     fr = tk.Frame(ddftWnw)
     fr.pack()
+    ddft2 = diff.diffDistTable(sbox)
     for i in range(16):
         row = tk.Label(fr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
         row.grid(row = 0, column = i+1)
         col = tk.Label(fr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
         col.grid(row = i+1, column = 0)
         for j in range(16):
-            prob = tk.Label(fr,text =ddft[i][j], relief=tk.RIDGE, width=10)
+            prob = tk.Label(fr,text =ddft2[i][j], relief=tk.RIDGE, width=10)
             prob.grid(row = i+1, column = j+1)
+            if not(ddft [i][j] == ddft2[i][j]):
+                print("The one in ", i, ", ", j, " is different")
             #print(ddft[i][j])
 
 def showLAT(wn):
@@ -69,7 +73,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
     print(inputString)
 
     if(type == "Differential"):
-        bt = tk.Button(wdw, text = "Difference distribution table", command = lambda: showDdft(wdw))
+        bt = tk.Button(wdw, text = "Difference distribution table", command = lambda: showDdft(wdw, sBox))
         bt.pack()
 
     """def __init__(self,inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox):
@@ -81,8 +85,8 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
         self.pBox = pBox"""
     if(type == "Linear"):
         bt = tk.Button(wdw, text = "Linear Approximation table", command = lambda: showDdft(wdw))
-        bt.pack() 
-    
+        bt.pack()
+
     wdw.title("Visualisation")
 #wdw.resizable(height = True, width =True)
 #wdw.geometry('300x400')
@@ -156,11 +160,11 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
 
                 #arrows from s boxes
                 #left arrow
-                print("*********************************")
-                print(a)
-                print(4*a)
-                print(pBox[4*a])
-                print(positions_x[pBox[4*a]])
+                #print("*********************************")
+                #print(a)
+                #print(4*a)
+                #print(pBox[4*a])
+                #print(positions_x[pBox[4*a]])
                 arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST)
                 arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='green')
                 arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
