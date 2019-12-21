@@ -10,7 +10,7 @@ if __name__ == '__main__':
     if len(sys.argv)>1:
         if sys.argv[1] == "diff":
             sBox = [6,4,12,5,0,7,2,14,1,15,3,13,8,10,9,11]
-            pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
+            pBox =[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11,15]
             visual.visual("aa", 2, 2, 4, sBox, pBox, "Differential")
 
 window =Tk()
@@ -37,6 +37,11 @@ Label(window, text="Write input").grid(row = 5, column=0)
 input = Entry(window, width = 10)
 input.grid(row = 6, column=0)
 
+#Getting the output
+Label(window, text="Write output").grid(row = 7, column=0)
+output = Entry(window, width = 10)
+output.grid(row = 8, column=0)
+
 #choosing number of S-box
 
 sbox = []
@@ -44,10 +49,10 @@ entries = []
 entry_titles = []
     #while j<boxes.get():
 for i in range(1,17):
-    Label(text = i-1, relief=RIDGE, width=10).grid(row = 9, column=i)
+    Label(text = i-1, relief=RIDGE, width=10).grid(row = 11, column=i)
     #entry_titles.append(et)
     ent = Entry(width = 10)
-    ent.grid(row = 10, column=i)
+    ent.grid(row = 12, column=i)
     entries.append(ent)
     #j +=1
     """cell.grid(row =0,column= i)
@@ -79,22 +84,22 @@ def createPbox(self):
 
     while j<4*boxes.get():
         et = Label(text = j, relief=RIDGE, width=10)
-        et.grid(row = 12, column=j+1)
+        et.grid(row = 14, column=j+1)
         pentry_titles.append(et)
         ent = Entry(width = 10)
-        ent.grid(row = 13, column=j+1)
+        ent.grid(row = 15, column=j+1)
         pBox.append(ent)
         j +=1
 
-Label(text = "x", relief=RIDGE, width=10).grid(row = 12, column=0)
+Label(text = "x", relief=RIDGE, width=10).grid(row = 14, column=0)
 
-Label(text = "P[x]", relief=RIDGE, width=10).grid(row = 13, column=0)
+Label(text = "P[x]", relief=RIDGE, width=10).grid(row = 15, column=0)
 
 boxes = IntVar(window)
 box_choices = (2,2,3,4,5)
 boxpopupMenu = OptionMenu(window, boxes, *box_choices, command = createPbox)
-Label(window, text="Choose the number of S-boxes").grid(row = 7, column=0)
-boxpopupMenu.grid(row = 8, column = 0)
+Label(window, text="Choose the number of S-boxes").grid(row = 9, column=0)
+boxpopupMenu.grid(row = 10, column = 0)
 
 #create S-box tables
 height = 2
@@ -107,9 +112,9 @@ cells = {}
 #        cells[(i,j)]=b
 table = Frame(window)
 
-Label(text = "x", relief=RIDGE, width=10).grid(row = 9, column=0)
+Label(text = "x", relief=RIDGE, width=10).grid(row = 11, column=0)
 
-Label(text = "S[x]", relief=RIDGE, width=10).grid(row = 10, column=0)
+Label(text = "S[x]", relief=RIDGE, width=10).grid(row = 12, column=0)
 
 
 def printSbox():
@@ -135,6 +140,6 @@ def create():
     visual.visual(inputString, len(inputString), rounds.get(), boxes.get(), sbox, send, type.get())
 
 generateButton = Button(window, text = "Generate", command = create)
-generateButton.grid(row = 14, column = 0)
+generateButton.grid(row = 16, column = 0)
 
 window.mainloop()

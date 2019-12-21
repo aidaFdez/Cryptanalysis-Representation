@@ -1,6 +1,8 @@
 import tkinter as tk
 import diff
 
+
+
 #Difference distribution table hardcoded
 ddft = [[16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,6,0,0,0,0,2,0,2,0,0,2,0,4,0],
@@ -37,11 +39,13 @@ lat = [[16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,4,10,10,4,0,6,6,0,0,6,10,0,0,6,10]]
 
 def showDdft(wn, sbox):
+    #Create a new window for the DDFT, on top of the visual one
     ddftWnw = tk.Toplevel(wn)
     fr = tk.Frame(ddftWnw)
     fr.pack()
     ddft2 = diff.diffDistTable(sbox)
     for i in range(16):
+        #TODO change colour depending on the row for easiness to read
         row = tk.Label(fr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
         row.grid(row = 0, column = i+1)
         col = tk.Label(fr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
@@ -53,9 +57,15 @@ def showDdft(wn, sbox):
                 print("The one in ", i, ", ", j, " is different")
             #print(ddft[i][j])
 
+#Show the probabilty for Differential
+def show_prob(frm, t, type):
+    if (type == "Differential"):
+        #This is probably not what I want, but meh
+        print(ddft[frm])
+
 def showLAT(wn):
     lanWnw = tk.Toplevel(wn)
-    lanfr = tk.Fram(lanWnw)
+    lanfr = tk.Frame(lanWnw)
     lanWnw.pack()
     for i in range(16):
         row = tk.Label(lanfr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
@@ -134,8 +144,15 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 #arrows to sboxes
                 #round 1
                 if (r == 0) :
+                    print(a, " ", r)
+                    #TODO check how to make it do something when clicking on arrow
                     #Arrow to the left
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+75, width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+105,arrow=tk.LAST)
+                    #Button for showing the probability:
+                    if(type == "Differential"):
+                        bt = tk.Button(arrow1_canvas, text = "Ppppppppp", command = lambda: show_prob(0,0, "Differential"))
+                        #bt.grid_location(width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+105)
+                        bt.place((width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+105))
                     #Arrow to the RIGHT
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,(r+1)*end_arrow+75, width/(num_arrows+1)*(a+1)+20,(r+1)*end_arrow+105,arrow=tk.LAST)
                     #Arrow to the center left
