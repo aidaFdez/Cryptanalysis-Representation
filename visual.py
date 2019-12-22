@@ -1,5 +1,6 @@
 import tkinter as tk
 import diff
+import lin
 
 
 
@@ -21,6 +22,7 @@ ddft = [[16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,2,0,4,2,0,0,0,0,0,2,0,0,0,0,6],
         [0,0,0,0,2,0,2,0,0,0,0,0,0,10,0,2]]
 
+#Linear approximation table hardcoded
 lat = [[16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,6,0,10,0,6,12,6,10,12,10,0,6,0,10,0],
         [0,10,6,0,6,0,0,10,10,12,0,10,12,6,6,0],
@@ -57,16 +59,11 @@ def showDdft(wn, sbox):
                 print("The one in ", i, ", ", j, " is different")
             #print(ddft[i][j])
 
-#Show the probabilty for Differential
-def show_prob(frm, t, type):
-    if (type == "Differential"):
-        #This is probably not what I want, but meh
-        print(ddft[frm])
-
-def showLAT(wn):
+def showLAT(wn, sbox):
     lanWnw = tk.Toplevel(wn)
     lanfr = tk.Frame(lanWnw)
-    lanWnw.pack()
+    lanfr.pack()
+    lat2 = lin.linApptable(sbox)
     for i in range(16):
         row = tk.Label(lanfr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
         row.grid(row = 0, column = i+1)
@@ -75,6 +72,8 @@ def showLAT(wn):
         for j in range(16):
             prob = tk.Label(lanfr,text =ddft[i][j], relief=tk.RIDGE, width=10)
             prob.grid(row = i+1, column = j+1)
+            if not(lat[i][j] == lat2[i][j]):
+                print("The one in ", i, ", ", j, " is different")
 
 
 def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
@@ -94,7 +93,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
         self.sBox = sBox
         self.pBox = pBox"""
     if(type == "Linear"):
-        bt = tk.Button(wdw, text = "Linear Approximation table", command = lambda: showDdft(wdw))
+        bt = tk.Button(wdw, text = "Linear Approximation table", command = lambda: showLAT(wdw, sBox))
         bt.pack()
 
     wdw.title("Visualisation")
