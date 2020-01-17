@@ -70,7 +70,7 @@ def showLAT(wn, sbox):
         col = tk.Label(lanfr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
         col.grid(row = i+1, column = 0)
         for j in range(16):
-            prob = tk.Label(lanfr,text =ddft[i][j], relief=tk.RIDGE, width=10)
+            prob = tk.Label(lanfr,text =lat2[i][j], relief=tk.RIDGE, width=10)
             prob.grid(row = i+1, column = j+1)
             if not(lat[i][j] == lat2[i][j]):
                 print("The one in ", i, ", ", j, " is different")
