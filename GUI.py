@@ -128,19 +128,58 @@ def printSbox():
         if (number != ""):
             print(number)
 
+def popupmsg(msg):
+    popup = Tk()
+    popup.wm_title("ERROR")
+    label = Label(popup, text=msg)
+    label.pack(side="top", fill="x", pady=10)
+    B1 = Button(popup, text="Okay", command = popup.destroy)
+    B1.pack()
+    popup.mainloop()
+
 
 def create():
     #Get the input string
     inputString = input.get()
+    #Get the output string
+    outputString = output.get()
+ 
+    #check linear/differential selected
+    if(not type.get()):
+        popupmsg("Please select the type of cryptanalysis you want to use")
+        return
+
+    #check written fields not blank
+    if (inputString == "" or outputString == ""):
+        popupmsg("You have a blank text field")
+        return   
+
     #Get the pBox
     send = []
     for en in pBox:
+        #checks to correct values
+        if (int(en.get()) < 0 or int(en.get()) > 4*int(boxes.get())):
+            popupmsg("pbox values out of range")
+            return
+        if (int(en.get()) in send):
+            popupmsg("Repeated pbox values")
+            return
         send.append(int(en.get()))
+
     #Get the sbox
     sbox = []
     for en in entries:
+        #checks for correct values
+        if (int(en.get()) < 0 or int(en.get()) > 15):
+            popupmsg("sbox values out of range")
+            return
+        if (int(en.get()) in sbox):
+            popupmsg("Repeated sbox values")
+            return
         sbox.append(int(en.get()))
+    
 
+    #inset output string TODO
     print(type.get())
     visual.visual(inputString, len(inputString), rounds.get(), boxes.get(), sbox, send, type.get())
 
