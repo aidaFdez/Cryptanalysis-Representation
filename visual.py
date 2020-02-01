@@ -147,11 +147,6 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                     #TODO check how to make it do something when clicking on arrow
                     #Arrow to the left
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+75, width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+105,arrow=tk.LAST)
-                    #Button for showing the probability:
-                    if(type == "Differential"):
-                        bt = tk.Button(arrow1_canvas, text = "Ppppppppp", command = lambda: show_prob(0,0, "Differential"))
-                        #bt.grid_location(width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+105)
-                        bt.place((width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+105))
                     #Arrow to the RIGHT
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,(r+1)*end_arrow+75, width/(num_arrows+1)*(a+1)+20,(r+1)*end_arrow+105,arrow=tk.LAST)
                     #Arrow to the center left
