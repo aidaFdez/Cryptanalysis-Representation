@@ -48,7 +48,7 @@ output = Entry(window, width = 10)
 output.grid(row = 8, column=0)
 
 #choosing number of S-box
-
+#TODO get the number of bits, the length of the sbox depends on it
 sbox = []
 entries = []
 entry_titles = []
@@ -125,8 +125,8 @@ Label(text = "S[x]", relief=RIDGE, width=10).grid(row = 12, column=0)
 def printSbox():
     for en in entries:
         number = en.get()
-        if (number != ""):
-            print(number)
+        #if (number != ""):
+            #print(number)
 
 def popupmsg(msg):
     popup = Tk()
@@ -143,7 +143,7 @@ def create():
     inputString = input.get()
     #Get the output string
     outputString = output.get()
- 
+
     #check linear/differential selected
     if(not type.get()):
         popupmsg("Please select the type of cryptanalysis you want to use")
@@ -152,7 +152,7 @@ def create():
     #check written fields not blank
     if (inputString == "" or outputString == ""):
         popupmsg("You have a blank text field")
-        return   
+        return
 
     #Get the pBox
     send = []
@@ -177,7 +177,7 @@ def create():
             popupmsg("Repeated sbox values")
             return
         sbox.append(int(en.get()))
-    
+
 
     #inset output string TODO
     print(type.get())

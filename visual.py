@@ -79,7 +79,7 @@ def showLAT(wn, sbox):
 def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
 
     wdw =tk.Tk()
-    print(inputString)
+    #print(inputString)
 
     if(type == "Differential"):
         bt = tk.Button(wdw, text = "Difference distribution table", command = lambda: showDdft(wdw, sBox))
@@ -143,7 +143,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 #arrows to sboxes
                 #round 1
                 if (r == 0) :
-                    print(a, " ", r)
+                    #print(a, " ", r)
                     #TODO check how to make it do something when clicking on arrow
                     #Arrow to the left
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+75, width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+105,arrow=tk.LAST)
