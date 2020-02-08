@@ -54,6 +54,10 @@ def showDdft(wn, sbox):
         col.grid(row = i+1, column = 0)
         for j in range(16):
             prob = tk.Label(fr,text =ddft2[i][j], relief=tk.RIDGE, width=10)
+            if (i % 2 == 0):
+                prob = tk.Label(fr,text =ddft2[i][j], relief=tk.RIDGE, width=10)
+            else:
+                prob = tk.Label(fr,text =ddft2[i][j], relief=tk.RIDGE, width=10, bg = 'LightSkyBlue1')
             prob.grid(row = i+1, column = j+1)
             if not(ddft [i][j] == ddft2[i][j]):
                 print("The one in ", i, ", ", j, " is different")
@@ -84,6 +88,9 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
     if(type == "Differential"):
         bt = tk.Button(wdw, text = "Difference distribution table", command = lambda: showDdft(wdw, sBox))
         bt.pack()
+        trail = diff.diffTrail(sBox, inputString, diff.diffDistTable(sBox))
+        for i in range(len(trail)):
+            print(i," ",trail[i])
 
     """def __init__(self,inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox):
         self.inputString = inputString
