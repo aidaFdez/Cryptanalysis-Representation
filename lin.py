@@ -8,16 +8,8 @@ def linApptable(sbox):
     lat = [[0 for col in range(size)] for row in range(size)]
     #  input mask
     for row in range(size):
-        #if((row != 1)):
-            #assert(1==0)
-        #    continue
         #  output mask
         for col in range(size):
-            #if((col != 1)):
-            #    continue
-            # for all inputs i
-            #assert(row == 1)
-            #assert(col == 1)
             for x in range(size):
 
                 masked_input = parity(row & x)
@@ -39,9 +31,44 @@ def parity(i):
 def corrolation(lat,size):
     #  input mask
     for row in range(size):
-        #if((row != 1)):
-            #assert(1==0)
-        #    continue
         #  output mask
         for col in range(size):
             lat[row][col] = (2*lat[row][col]/size)-1
+
+def linTrail(noOfSbox, maskString, lat):
+    mask = [maskString[i:i+noOfSbox] for i in range (0, len(maskString), noOfSbox)]
+    total_corr = 1
+    signed_cor = 1
+    newMask = []
+    sBoxCorr = []
+    for num in mask:
+        n = int(num,2)
+        maxCorr = 0
+        output = 16
+        for x in range(noOfSbox*4):
+            if abs(lat[n][x]) > maxCorr:
+                #print(num,x,output, maxCorr)
+                maxCorr = abs(lat[n][x])
+                signed_cor = lat[n][x]
+                output = x
+            elif abs(lat[n][x]) == maxCorr and x < output:
+                #print(num,x,output)
+                output = x
+                signed_cor = lat[n][x]
+        #print(maxCorr)
+        sBoxCorr.append(maxCorr)
+        total_corr = total_corr*signed_cor
+        
+        newMask.append(output)
+    return total_corr, newMask, sBoxCorr
+    
+        #implement for multiple rounds 
+            
+        #print relevant things and format
+
+        #stop prop
+
+
+
+
+

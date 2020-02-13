@@ -11,11 +11,14 @@ if __name__ == '__main__':
         pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
         if sys.argv[1] == "diff":
             sBox = [6,4,12,5,0,7,2,14,1,15,3,13,8,10,9,11]
-            pBox =[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11,15]
-            visual.visual("aa", 2, 2, 4, sBox, pBox, "Differential")
+            pBox =[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11,15, 17, 16, 18, 19]
+            visual.visual("000fa", 2, 2,len("000fa") , sBox, pBox, "Differential")
+            exit()
         if sys.argv[1] == "lin":
             sBox = [15,14,11,12,6,13,7,8,0,3,9,10,4,2,1,5]
-            visual.visual("aa", 2, 2, 4, sBox, pBox, "Linear")
+            pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
+            visual.visual("0000110011110011", 2, 2, 4, sBox, pBox, "Linear")
+            exit()
 
 
 window =Tk()
@@ -140,6 +143,7 @@ def popupmsg(msg):
 
 def create():
     #Get the input string
+    #TODO change string to mask
     inputString = input.get()
     #Get the output string
     outputString = output.get()
