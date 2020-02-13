@@ -205,6 +205,9 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 #Creating the rectangle with the text
                 arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155)
                 arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), end_arrow+130, text="S")
+                if(type == "Linear"):
+                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+110, text="Corr:")
+                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+130, text=trail[r][2][a])
 
                 #arrows from s boxes
                 #left arrow

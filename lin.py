@@ -38,7 +38,9 @@ def corrolation(lat,size):
 def linTrail(noOfSbox, maskString, lat):
     mask = [maskString[i:i+noOfSbox] for i in range (0, len(maskString), noOfSbox)]
     total_corr = 1
+    signed_cor = 1
     newMask = []
+    sBoxCorr = []
     for num in mask:
         n = int(num,2)
         maxCorr = 0
@@ -47,14 +49,18 @@ def linTrail(noOfSbox, maskString, lat):
             if abs(lat[n][x]) > maxCorr:
                 #print(num,x,output, maxCorr)
                 maxCorr = abs(lat[n][x])
+                signed_cor = lat[n][x]
                 output = x
             elif abs(lat[n][x]) == maxCorr and x < output:
                 #print(num,x,output)
                 output = x
-        total_corr = total_corr*maxCorr
+                signed_cor = lat[n][x]
+        #print(maxCorr)
+        sBoxCorr.append(maxCorr)
+        total_corr = total_corr*signed_cor
         
         newMask.append(output)
-    return total_corr, newMask
+    return total_corr, newMask, sBoxCorr
     
         #implement for multiple rounds 
             
