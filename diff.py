@@ -159,6 +159,15 @@ def highProb(input, ddt):
     #Counter to keep track of the iteration we are in
     numCount = 0
     for value in ddt[input]:
+        #Hamming heuristic
+        if(value == prob):
+            #Add all the numbers, the shortest one has less 0s
+            valCount = sum(getBinary(value))
+            numCount = sum(getBinary(num))
+            #If the value is smaller, then get that
+            if (valCount < numCount):
+                prob = value
+                num = numCount
         if (value > prob):
             #If the value is bigger than the one before, then keep that one in mind
             prob = value

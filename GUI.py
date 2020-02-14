@@ -11,11 +11,11 @@ if __name__ == '__main__':
         pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
         if sys.argv[1] == "diff":
             sBox = [6,4,12,5,0,7,2,14,1,15,3,13,8,10,9,11]
-            #pBox =[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11, 15]
+            pBox =[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11, 15]
             #sBox = [1,2,3,0, 5, 6, 7, 4]
-            pBox = [2,3,0,1, 5, 6, 7, 4, 9, 10, 11, 8]
+            #pBox = [2,3,0,1, 5, 6, 7, 4, 9, 10, 11, 8]
             #000f
-            visual.visual("00f", 2, 3,len("00f") , sBox, pBox, "Differential")
+            visual.visual("000f", 2, 3,len("000f") , sBox, pBox, "Differential")
             exit()
         if sys.argv[1] == "lin":
             sBox = [15,14,11,12,6,13,7,8,0,3,9,10,4,2,1,5]
@@ -42,14 +42,14 @@ Label(window, text="Choose the number of rounds").grid(row = 3, column=0)
 popupMenu.grid(row = 4, column = 0)
 
 #Getting the input
-Label(window, text="Write input").grid(row = 5, column=0)
+Label(window, text="Write input difference").grid(row = 5, column=0)
 input = Entry(window, width = 10)
 input.grid(row = 6, column=0)
 
-#Getting the output
+"""#Getting the output
 Label(window, text="Write output").grid(row = 7, column=0)
 output = Entry(window, width = 10)
-output.grid(row = 8, column=0)
+output.grid(row = 8, column=0)"""
 
 #choosing number of S-box
 #TODO get the number of bits, the length of the sbox depends on it
@@ -107,7 +107,7 @@ Label(text = "P[x]", relief=RIDGE, width=10).grid(row = 15, column=0)
 boxes = IntVar(window)
 box_choices = (2,2,3,4,5)
 boxpopupMenu = OptionMenu(window, boxes, *box_choices, command = createPbox)
-Label(window, text="Choose the number of S-boxes").grid(row = 9, column=0)
+Label(window, text="Choose the length of permutation box \n (this should be 4 times the \nlength of the input)").grid(row = 9, column=0)
 boxpopupMenu.grid(row = 10, column = 0)
 
 #create S-box tables
@@ -146,7 +146,7 @@ def create():
     #Get the input string
     inputString = input.get()
     #Get the output string
-    outputString = output.get()
+    #outputString = output.get()
 
     #check linear/differential selected
     if(not type.get()):
@@ -154,7 +154,7 @@ def create():
         return
 
     #check written fields not blank
-    if (inputString == "" or outputString == ""):
+    if (inputString == ""):
         popupmsg("You have a blank text field")
         return
 
