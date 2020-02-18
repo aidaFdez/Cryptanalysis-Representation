@@ -75,9 +75,13 @@ def showLAT(wn, sbox):
         col.grid(row = i+1, column = 0)
         for j in range(16):
             prob = tk.Label(lanfr,text =lat2[i][j], relief=tk.RIDGE, width=10)
+            if (i % 2 == 0):
+                prob = tk.Label(lanfr,text =lat2[i][j], relief=tk.RIDGE, width=10)
+            else:
+                prob = tk.Label(lanfr,text =lat2[i][j], relief=tk.RIDGE, width=10, bg = 'LightSkyBlue1')
             prob.grid(row = i+1, column = j+1)
-            if not(lat[i][j] == lat2[i][j]):
-                print("The one in ", i, ", ", j, " is different")
+            #if not(lat[i][j] == lat2[i][j]):
+            #    print("The one in ", i, ", ", j, " is different")
 
 #Variables to keep the trails and probabilities of the differential stuff
 trail = []
@@ -104,6 +108,27 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
     if(type == "Linear"):
         bt = tk.Button(wdw, text = "Linear Approximation table", command = lambda: showLAT(wdw, sBox))
         bt.pack()
+        trail = []
+        for corrPerRound in range(numOfRounds):
+            trail.append(lin.linTrail(sBoxes, inputString, lin.linApptable(sBox)))
+            for i in range(4):
+                get_bin = lambda x, n: format(x, 'b').zfill(n)
+                trail[corrPerRound][1][i] = get_bin(trail[corrPerRound][1][i], 4)
+            tempMask = ''.join(trail[corrPerRound][1])
+            permutedMask = []
+            for n in range(len(pBox)):
+                permutedMask.append(tempMask[pBox.index(n)]) 
+        #print(trail)
+        #print(pBox)
+        #print(permutedMask)
+            inputString = ''.join(permutedMask)
+        print(trail)
+        totalCorr = 1
+        for r in trail: 
+            totalCorr = totalCorr * r[0]
+        print(totalCorr)
+        #for i in range(len(trail)):
+        #    print(i," ",trail[i])
 
     wdw.title("Visualisation")
 #wdw.resizable(height = True, width =True)
@@ -145,6 +170,11 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
         arrow1_canvas.create_line(width/2,end_arrow+25 , width/2, end_arrow+65)
         arrow1_canvas.create_line((width/10)-15,end_arrow+45, (width/10),end_arrow+45,arrow=tk.LAST)
         arrow1_canvas.create_text((width/10)-20, end_arrow+45, text="k0")
+        #add linear probability for round one
+        if(type == "Linear"):
+            #TODO stop text moving
+            arrow1_canvas.create_text(width-60, end_arrow+105, text="Corrolation of round:")
+            arrow1_canvas.create_text(width-60, end_arrow+125, text=trail[0][0])
 
         #loop through each round
         for r in range(num_rounds):
@@ -176,6 +206,9 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 #Creating the rectangle with the text
                 arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155)
                 arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), end_arrow+130, text="S")
+                if(type == "Linear"):
+                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+110, text="Corr:")
+                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+130, text=trail[r][2][a])
 
                 #arrows from s boxes
                 #left arrow
@@ -237,12 +270,28 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 arrow1_canvas.create_line(width/2,end_arrow+35 , width/2, end_arrow+65)
                 arrow1_canvas.create_line((width/10)-15,end_arrow+50, (width/10),end_arrow+50,arrow=tk.LAST)
                 arrow1_canvas.create_text((width/10)-20, end_arrow+50, text="k"+str(r+1))
+
                 #The text with the round
-                arrow1_canvas.create_text(width/2+100, end_arrow+50, text=(diff.vals_string(trail[r])+" with probability "+str(probs[r])))
+                if(type == "Differential"):
+                    arrow1_canvas.create_text(width/2+100, end_arrow+50, text=(diff.vals_string(trail[r])+" with probability "+str(probs[r])))
+
+                if(type == "Linear"):
+                    #TODO stop text moving
+                    arrow1_canvas.create_text(width-60, end_arrow+105, text="Corrolation of round:")
+                    arrow1_canvas.create_text(width-60, end_arrow+125, text=trail[r][0])
 
             else:
                 #output
-                arrow1_canvas.create_text(width/2, end_arrow+50, text=trail[len(trail)-1])
+                arrow1_canvas.create_text(width/2, end_arrow+50, text="Output")
+
+                if(type == "Differential"):
+                    arrow1_canvas.create_text(width/2, end_arrow+50, text=trail[len(trail)-1])
+
+                if(type == "Linear"):
+                    #TODO stop text moving
+                    arrow1_canvas.create_text(width-60, end_arrow+105, text="Total corrolation")
+                    arrow1_canvas.create_text(width-60, end_arrow+125, text=totalCorr)
+
                 end_y = (r+1)*end_arrow+200
                 #arrow1_canvas.create_line(width/2,end_y, (width/10),width/2, end_y + 40,arrow=tk.LAST)
                         #input_frame = tk.Frame(width=768, height=576,bg="", master = wdw, colormap="new")
