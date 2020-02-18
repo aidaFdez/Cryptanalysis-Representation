@@ -1,0 +1,8 @@
+How well do you understand cryptanalysis?
+Are you able to understand what kind of data you need to input?
+Can you input the variables you want? -> 
+In the visual interface is it easy to identify what everything represents?
+What improvements would you make to the interface?
+Is there anything else you require or find missing from the interface?
+Do you think this could help aid the learning and understanding of cryptanalysis?
+Would you use this tool to learn or teach about this cryptanalysis?
