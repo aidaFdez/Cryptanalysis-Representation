@@ -118,10 +118,10 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
             permutedMask = []
             for n in range(len(pBox)):
                 permutedMask.append(tempMask[pBox.index(n)]) 
-        #print(trail)
+        print(trail)
         #print(pBox)
         #print(permutedMask)
-            inputString = ''.join(permutedMask)
+        inputString = ''.join(permutedMask)
         print(trail)
         totalCorr = 1
         for r in trail: 
@@ -225,38 +225,38 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                         bin.extend(diff.getBinary(val))
 
                 #make green arrows for 0s, red for 1s
-                if(type == "Differential"):
-                    #First arrow
-                    if(bin[pBox[4*a]] == 0):
-                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST, fill = 'blue')
-                    else:
-                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST, fill = 'red')
-                    #Second arrow
-                    if(bin[pBox[4*a+1]] == 0):
-                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='blue')
-                    else:
-                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='red')
-                    #Third arrow
-                    if(bin[pBox[4*a+2]] == 0):
-                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='blue')
-                    else:
-                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
-                    #Fourth arrow:
-                    if(bin[pBox[4*a+3]] == 0):
-                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
-                    else:
-                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='red')
+                #if(type == "Differential"):
+                #First arrow
+                if((type == "Differential" and bin[pBox[4*a]] == 0) or (type == "Linear" and trail[r][2][a] == 0)):
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST, fill = 'blue')
+                else:
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST, fill = 'red')
+                #Second arrow
+                if((type == "Differential" and bin[pBox[4*a+1]] == 0) or (type == "Linear" and trail[r][2][a] == 0)):
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='blue')
+                else:
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='red')
+                #Third arrow
+                if((type == "Differential" and bin[pBox[4*a+2]] == 0) or (type == "Linear" and trail[r][2][a] == 0)):
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='blue')
+                else:
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
+                #Fourth arrow:
+                if((type == "Differential" and bin[pBox[4*a+3]] == 0) or (type == "Linear" and trail[r][2][a] == 0)):
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
+                else:
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='red')
 
                 #If it is not differential, do the following (just as before I touched the code)
-                else:
-                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST)
-                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='green')
-                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
+                #else:
+                #    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST)
+                #    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='green')
+                #    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
 
                 #print(str(4*a+3))
                 #print("pbox " + str(pBox[4*a+3]))
                 #print("positions_x "+str(positions_x[pBox[4*a+3]]))
-                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
+                #    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
             #output box
             arrow1_canvas.create_rectangle((width/10), end_arrow+325, (width-width/10), end_arrow+375)
             end_arrow = end_arrow+300
