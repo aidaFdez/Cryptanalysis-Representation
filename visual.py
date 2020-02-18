@@ -224,25 +224,26 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                     for val in trail[r]:
                         bin.extend(diff.getBinary(val))
 
-                #make green arrows for 0s, red for 1s
+                #make green arrows for 0s, red for 1sgit push --set-upstream origin master
                 #if(type == "Differential"):
+            
                 #First arrow
-                if((type == "Differential" and bin[pBox[4*a]] == 0) or (type == "Linear" and trail[r][2][a] == 0)):
+                if((type == "Differential" and bin[pBox[4*a]] == 0) or (type == "Linear" and (trail[r][1][a])[0] == '0')):
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST, fill = 'blue')
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST, fill = 'red')
                 #Second arrow
-                if((type == "Differential" and bin[pBox[4*a+1]] == 0) or (type == "Linear" and trail[r][2][a] == 0)):
+                if((type == "Differential" and bin[pBox[4*a+1]] == 0) or (type == "Linear" and (trail[r][1][a])[1] == '0')):
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='blue')
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='red')
                 #Third arrow
-                if((type == "Differential" and bin[pBox[4*a+2]] == 0) or (type == "Linear" and trail[r][2][a] == 0)):
+                if((type == "Differential" and bin[pBox[4*a+2]] == 0) or (type == "Linear" and (trail[r][1][a])[2] == '0')):
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='blue')
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
                 #Fourth arrow:
-                if((type == "Differential" and bin[pBox[4*a+3]] == 0) or (type == "Linear" and trail[r][2][a] == 0)):
+                if((type == "Differential" and bin[pBox[4*a+3]] == 0) or (type == "Linear" and (trail[r][1][a])[3] == '0')):
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='red')
