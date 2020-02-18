@@ -21,47 +21,134 @@ def diffDistTable(sbox):
             ddt[w][c] = ddt[w][c]+1
     return ddt
 
-def diffTrail(sbox, data, ddt):
+def diffTrail(sbox, data, ddt, pbox, rounds):
     #Get the data in numbers
     str = getInts(data)
-    """#Transform based on s-box
-    transformed = []
-    for c in str:
-        transformed.append(sbox[c])"""
-    #Populate the trail changes, calculate the most probable transformation
+    #Populate the trail changes, calculate the most probable transformation.
     trail = []
-    for val in str:
-        print(val, " has match ", highProb(val, ddt))
-        trail.append(highProb(val, ddt))
-    return trail
+    #Keep the probability of the round respect the previous one
+    probabilities = []
+
+    for r in range(rounds):
+        #print("In round ", r)
+        #If it is the first round, do it from the input
+        if(r==0):
+            prob = 1
+            vals = []
+            for val in str:
+                value, probability = highProb(val, ddt)
+                #Save the trail value
+                vals.append(value)
+                #print(val, " has match ", value, " with probability ", probability/(len(data)*4))
+                #Update the probability of that specific trail
+                prob = prob* (probability/16)
+            #print("values are ", vals)
+            #Need to apply the permutation to the values:
+            swapped = pBoxSwaps(pbox, vals)
+            #print("probability of this round is ", probability)
+            trail.append(swapped)
+            #Save the probability of this round
+            probabilities.append(prob)
+        #If it is not the first round, do it from what was left before
+        else:
+            #print("entered else")
+            print(trail)
+            vals = []
+            prob = 1
+            #Same as before, but taking the previous ones as base
+            print(trail[r-1])
+            for val in trail[r-1]:
+                print(val)
+                value, probability = highProb(val, ddt)
+                #print(val, " has match ", value, " with probability ", probability, " (2)")
+                vals.append(value)
+                prob = prob* (probability/16)
+            swapped = pBoxSwaps(pbox, vals)
+            #print("values are ", vals)
+            #Save the probability of this round
+            probabilities.append(prob)
+            trail.append(swapped)
+    print("************", trail)
+    print("************", probabilities)
+    return trail, probabilities
 
 #Do the swaps according to the pBox
 def pBoxSwaps(pBox, input):
-    output = ""
+    #print("************Entered PBOX*********")
+    #output =""
+    output =[]
+    #print(input, " THE INPUT")
+    #Get the binary values of the input difference
     for ch in input:
-        output += getBinary(ch)
-    print("Output is ", output)
-    for n in range(len(pBox)):
-        return
-    return output
+        #output += getBinary(ch)
+        #print(ch, "CHARACTERRR")
+        output.extend(getBinary(ch))
+    #print("Output is ", output)
+    #bin_output =  "0"*len(input)
+    bin_output =  [0]*len(pBox)
+    #Do the swaps
+    for n in range(int(len(pBox))):
+        #print(n)
+        #print(int(len(pBox)), " is the range")
+        #print(pBox[n], "is the pbox value")
+        #print(output[n], "is the output value")
+        bin_output[pBox[n]] = output[n]
+    #print(bin_output, " binary output")
+    new_diff = []
+    #That division should be the number of bits of the thingy
+    #print(len(pBox), " is the length of the pBox")
+    for r in range(len(input)):
+        num = []
+        #print ("Doing round ", r)
+        #print(r*4, " first r")
+        #print((r*4)+1, " second r")
+        num.append(bin_output[r*4])
+        num.append(bin_output[r*4+1])
+        num.append(bin_output[r*4+2])
+        num.append(bin_output[(r*4)+3])
+        #print(num, " this is the value")
+        #print(fromBinary(num), " received")
+        new_diff.extend(fromBinary(num))
+        #print(new_diff, " extended")
+    #print("************Exiting PBOX*********")
+    return new_diff
 
-def getBinary(inp):
-    if (c == '0'): return "0000"
-    if (c == '1'): return "1000"
-    if (c == '2'): return "0100"
-    if (c == '3'): return "1100"
-    if (c == '4'): return "0010"
-    if (c == '5'): return "1010"
-    if (c == '6'): return "0110"
-    if (c == '7'): return "1110"
-    if (c == '8'): return "0001"
-    if (c == '9'): return "1001"
-    if (c == 'a' or c == 'A'): return "0101"
-    if (c == 'b' or c == 'B'): return "1101"
-    if (c == 'c' or c == 'C'): return "0011"
-    if (c == 'd' or c == 'D'): return "1011"
-    if (c == 'e' or c == 'E'): return "0111"
-    if (c == 'f' or c == 'F'): return "1111"
+def getBinary(c):
+    if (c == 0): return [0,0,0,0]
+    if (c == 1): return [1,0,0,0]
+    if (c == 2): return [0,1,0,0]
+    if (c == 3): return [1,1,0,0]
+    if (c == 4): return [0,0,1,0]
+    if (c == 5): return [1,0,1,0]
+    if (c == 6): return [0,1,1,0]
+    if (c == 7): return [1,1,1,0]
+    if (c == 8): return [0,0,0,1]
+    if (c == 9): return [1,0,0,1]
+    if (c == 10 or c == 'A'): return [0,1,0,1]
+    if (c == 11 or c == 'B'): return [1,1,0,1]
+    if (c == 12 or c == 'C'): return [0,0,1,1]
+    if (c == 13 or c == 'D'): return [1,0,1,1]
+    if (c == 14 or c == 'E'): return [0,1,1,1]
+    if (c == 15 or c == 'F'): return [1,1,1,1]
+    else: print("FAILEEED")
+
+def fromBinary(c):
+    if (c == [0,0,0,0]): return [0]
+    if (c == [1,0,0,0]): return [1]
+    if (c == [0,1,0,0]): return [2]
+    if (c == [1,1,0,0]): return [3]
+    if (c == [0,0,1,0]): return [4]
+    if (c == [1,0,1,0]): return [5]
+    if (c == [0,1,1,0]): return [6]
+    if (c == [1,1,1,0]): return [7]
+    if (c == [0,0,0,1]): return [8]
+    if (c == [1,0,0,1]): return [9]
+    if (c == [0,1,0,1]): return [10]
+    if (c == [1,1,0,1]): return [11]
+    if (c == [0,0,1,1]): return [12]
+    if (c == [1,0,1,1]): return [13]
+    if (c == [0,1,1,1]): return [14]
+    if (c == [1,1,1,1]): return [15]
 
 #Get the highest probability of a value
 def highProb(input, ddt):
@@ -72,6 +159,15 @@ def highProb(input, ddt):
     #Counter to keep track of the iteration we are in
     numCount = 0
     for value in ddt[input]:
+        #Hamming heuristic
+        if(value == prob):
+            #Add all the numbers, the shortest one has less 0s
+            valCount = sum(getBinary(value))
+            numCount = sum(getBinary(num))
+            #If the value is smaller, then get that
+            if (valCount < numCount):
+                prob = value
+                num = numCount
         if (value > prob):
             #If the value is bigger than the one before, then keep that one in mind
             prob = value
@@ -79,7 +175,7 @@ def highProb(input, ddt):
         #Keep track of the iteration we are in
         numCount = numCount+1
     #Return the index of the most probable, ie: the one it gets substituted for
-    return num
+    return num, prob
 
 #Get the integer related to the input
 def getInts(str):
@@ -88,7 +184,7 @@ def getInts(str):
     nums = []
     if pattern.match(str):
         for c in str:
-            print(c)
+            #print(c)
             if (c == '0'): nums.append(0)
             if (c == '1'): nums.append(1)
             if (c == '2'): nums.append(2)
@@ -107,6 +203,20 @@ def getInts(str):
             if (c == 'f' or c == 'F'): nums.append(15)
     else: nums.append(9999)
     return nums
+
+def vals_string(vals):
+    #print("********************************")
+    #print(vals)
+    stn = "["
+    sep = ""
+    for val in vals:
+        #print(val)
+        stn= stn+sep
+        sep = ","
+        stn = stn+str(val)
+    stn = stn+"]"
+    return stn
+
 
 #TODO Divide the input, so it has the correct sizes. How do we pad the ones that are not long enough?
 

@@ -83,7 +83,9 @@ def showLAT(wn, sbox):
             #if not(lat[i][j] == lat2[i][j]):
             #    print("The one in ", i, ", ", j, " is different")
 
-
+#Variables to keep the trails and probabilities of the differential stuff
+trail = []
+probs = []
 def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
 
     wdw =tk.Tk()
@@ -92,9 +94,9 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
     if(type == "Differential"):
         bt = tk.Button(wdw, text = "Difference distribution table", command = lambda: showDdft(wdw, sBox))
         bt.pack()
-        trail = diff.diffTrail(sBox, inputString, diff.diffDistTable(sBox))
-        for i in range(len(trail)):
-            print(i," ",trail[i])
+        trail, probs = diff.diffTrail(sBox, inputString, diff.diffDistTable(sBox), pBox, numOfRounds)
+        """for i in range(len(trail)):
+            print(i," ",trail[i])"""
 
     """def __init__(self,inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox):
         self.inputString = inputString
@@ -181,7 +183,6 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 #round 1
                 if (r == 0) :
                     #print(a, " ", r)
-                    #TODO check how to make it do something when clicking on arrow
                     #Arrow to the left
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+75, width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+105,arrow=tk.LAST)
                     #Arrow to the RIGHT
@@ -216,19 +217,52 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 #print(4*a)
                 #print(pBox[4*a])
                 #print(positions_x[pBox[4*a]])
-                arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST)
-                arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='green')
-                arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
+                #Get the binary stuff:
+                if(type == "Differential"):
+                    bin = []
+                    #For each value in the trail of this round
+                    for val in trail[r]:
+                        bin.extend(diff.getBinary(val))
+
+                #make green arrows for 0s, red for 1s
+                if(type == "Differential"):
+                    #First arrow
+                    if(bin[pBox[4*a]] == 0):
+                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST, fill = 'blue')
+                    else:
+                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST, fill = 'red')
+                    #Second arrow
+                    if(bin[pBox[4*a+1]] == 0):
+                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='blue')
+                    else:
+                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='red')
+                    #Third arrow
+                    if(bin[pBox[4*a+2]] == 0):
+                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='blue')
+                    else:
+                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
+                    #Fourth arrow:
+                    if(bin[pBox[4*a+3]] == 0):
+                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
+                    else:
+                        arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='red')
+
+                #If it is not differential, do the following (just as before I touched the code)
+                else:
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST)
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='green')
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
 
                 #print(str(4*a+3))
                 #print("pbox " + str(pBox[4*a+3]))
                 #print("positions_x "+str(positions_x[pBox[4*a+3]]))
-                arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
             #output box
             arrow1_canvas.create_rectangle((width/10), end_arrow+325, (width-width/10), end_arrow+375)
             end_arrow = end_arrow+300
 
-            #If it's not the last one, then draw the XOR
+
+            #If it's not the last one, then draw the XOR and put the entering values
             if (r != num_rounds-1) :
                 #xor
                 arrow1_canvas.create_oval(width/2-15, end_arrow+35, width/2+15, end_arrow+65)
@@ -236,6 +270,11 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 arrow1_canvas.create_line(width/2,end_arrow+35 , width/2, end_arrow+65)
                 arrow1_canvas.create_line((width/10)-15,end_arrow+50, (width/10),end_arrow+50,arrow=tk.LAST)
                 arrow1_canvas.create_text((width/10)-20, end_arrow+50, text="k"+str(r+1))
+
+                #The text with the round
+                if(type == "Differential"):
+                    arrow1_canvas.create_text(width/2+100, end_arrow+50, text=(diff.vals_string(trail[r])+" with probability "+str(probs[r])))
+
                 if(type == "Linear"):
                     #TODO stop text moving
                     arrow1_canvas.create_text(width-60, end_arrow+105, text="Corrolation of round:")
@@ -244,10 +283,15 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
             else:
                 #output
                 arrow1_canvas.create_text(width/2, end_arrow+50, text="Output")
+
+                if(type == "Differential"):
+                    arrow1_canvas.create_text(width/2, end_arrow+50, text=trail[len(trail)-1])
+
                 if(type == "Linear"):
                     #TODO stop text moving
                     arrow1_canvas.create_text(width-60, end_arrow+105, text="Total corrolation")
                     arrow1_canvas.create_text(width-60, end_arrow+125, text=totalCorr)
+
                 end_y = (r+1)*end_arrow+200
                 #arrow1_canvas.create_line(width/2,end_y, (width/10),width/2, end_y + 40,arrow=tk.LAST)
                         #input_frame = tk.Frame(width=768, height=576,bg="", master = wdw, colormap="new")
