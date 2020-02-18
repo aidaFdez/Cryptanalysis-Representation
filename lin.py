@@ -47,26 +47,19 @@ def linTrail(noOfSbox, maskString, lat):
         output = 16
         for x in range(noOfSbox*4):
             if abs(lat[n][x]) > maxCorr:
-                #print(num,x,output, maxCorr)
                 maxCorr = abs(lat[n][x])
                 signed_cor = lat[n][x]
                 output = x
             elif abs(lat[n][x]) == maxCorr and x < output:
-                #print(num,x,output)
                 output = x
                 signed_cor = lat[n][x]
-        #print(maxCorr)
         sBoxCorr.append(maxCorr)
         total_corr = total_corr*signed_cor
         
         newMask.append(output)
     return total_corr, newMask, sBoxCorr
     
-        #implement for multiple rounds 
-            
-        #print relevant things and format
 
-        #stop prop
 
 
 

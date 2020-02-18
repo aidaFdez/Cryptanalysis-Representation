@@ -83,7 +83,7 @@ def showLAT(wn, sbox):
             #if not(lat[i][j] == lat2[i][j]):
             #    print("The one in ", i, ", ", j, " is different")
 
-#Variables to keep the trails and probabilities of the differential stuff
+#Variables to keep the trails and probabilities
 trail = []
 probs = []
 def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
@@ -173,8 +173,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
         #add linear probability for round one
         if(type == "Linear"):
             #TODO stop text moving
-            arrow1_canvas.create_text(width-60, end_arrow+105, text="Corrolation of round:")
-            arrow1_canvas.create_text(width-60, end_arrow+125, text=trail[0][0])
+            arrow1_canvas.create_text(width/2+110, end_arrow+45, text=" Corrolation of round: " + str(trail[0][0]))
 
         #loop through each round
         for r in range(num_rounds):
@@ -278,20 +277,18 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
 
                 if(type == "Linear"):
                     #TODO stop text moving
-                    arrow1_canvas.create_text(width-60, end_arrow+105, text="Corrolation of round:")
-                    arrow1_canvas.create_text(width-60, end_arrow+125, text=trail[r][0])
+                    arrow1_canvas.create_text(width/2+110, end_arrow+50, text="Corrolation of round: " + str(trail[r][0]))
 
             else:
                 #output
-                arrow1_canvas.create_text(width/2, end_arrow+50, text="Output")
+                #arrow1_canvas.create_text(width/2, end_arrow+50, text="Output")
 
                 if(type == "Differential"):
                     arrow1_canvas.create_text(width/2, end_arrow+50, text=trail[len(trail)-1])
 
                 if(type == "Linear"):
                     #TODO stop text moving
-                    arrow1_canvas.create_text(width-60, end_arrow+105, text="Total corrolation")
-                    arrow1_canvas.create_text(width-60, end_arrow+125, text=totalCorr)
+                    arrow1_canvas.create_text(width/2, end_arrow+50, text="Total corrolation: "+ str(totalCorr))
 
                 end_y = (r+1)*end_arrow+200
                 #arrow1_canvas.create_line(width/2,end_y, (width/10),width/2, end_y + 40,arrow=tk.LAST)
