@@ -53,11 +53,12 @@ def linTrail(noOfSbox, maskString, lat):
             elif abs(lat[n][x]) == maxCorr and x < output:
                 output = x
                 signed_cor = lat[n][x]
-        sBoxCorr.append(maxCorr)
+        sBoxCorr.append(math.log(maxCorr, 2.0))
         total_corr = total_corr*signed_cor
-        
+        #convert to log base 2
+        total_corr_base_2 = math.log(abs(total_corr), 2.0)
         newMask.append(output)
-    return total_corr, newMask, sBoxCorr
+    return total_corr_base_2, newMask, sBoxCorr
     
 
 

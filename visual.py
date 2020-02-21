@@ -1,6 +1,7 @@
 import tkinter as tk
 import diff
 import lin
+import math
 
 
 
@@ -109,6 +110,8 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
         bt = tk.Button(wdw, text = "Linear Approximation table", command = lambda: showLAT(wdw, sBox))
         bt.pack()
         trail = []
+        sboxMasks = []
+        sboxMasks.append([inputString[i:i+4] for i in range(0,len(inputString), 4)])
         for corrPerRound in range(numOfRounds):
             trail.append(lin.linTrail(sBoxes, inputString, lin.linApptable(sBox)))
             for i in range(4):
@@ -118,10 +121,14 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
             permutedMask = []
             for n in range(len(pBox)):
                 permutedMask.append(tempMask[pBox.index(n)]) 
-        print(trail)
+            inputString = ''.join(permutedMask)
+            sboxMasks.append([inputString[i:i+4] for i in range(0,len(inputString), 4)])
+            #print(inputString)
+        #print(trail)
         #print(pBox)
         #print(permutedMask)
-        inputString = ''.join(permutedMask)
+        print(sboxMasks)
+        #print(inputString)
         print(trail)
         totalCorr = 1
         for r in trail: 
@@ -173,7 +180,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
         #add linear probability for round one
         if(type == "Linear"):
             #TODO stop text moving
-            arrow1_canvas.create_text(width/2+110, end_arrow+45, text=" Corrolation of round: " + str(trail[0][0]))
+            arrow1_canvas.create_text(width/2+110, end_arrow+45, text=" Corrolation of round: " + str(round(trail[0][0],2)))
 
         #loop through each round
         for r in range(num_rounds):
@@ -206,6 +213,8 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155)
                 arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), end_arrow+130, text="S")
                 if(type == "Linear"):
+                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+110, text="mask")
+                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+130, text=sboxMasks[r][a])
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+110, text="Corr:")
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+130, text=trail[r][2][a])
 
@@ -228,24 +237,29 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
             
                 #First arrow
                 if((type == "Differential" and bin[pBox[4*a]] == 0) or (type == "Linear" and (trail[r][1][a])[0] == '0')):
+                    #print("here1")
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST, fill = 'blue')
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST, fill = 'red')
                 #Second arrow
                 if((type == "Differential" and bin[pBox[4*a+1]] == 0) or (type == "Linear" and (trail[r][1][a])[1] == '0')):
-                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='blue')
-                else:
-                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='red')
-                #Third arrow
-                if((type == "Differential" and bin[pBox[4*a+2]] == 0) or (type == "Linear" and (trail[r][1][a])[2] == '0')):
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='blue')
+                    #print(("here2" + trail[r][1][a])[1] )
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
-                #Fourth arrow:
-                if((type == "Differential" and bin[pBox[4*a+3]] == 0) or (type == "Linear" and (trail[r][1][a])[3] == '0')):
+                #Third arrow
+                if((type == "Differential" and bin[pBox[4*a+2]] == 0) or (type == "Linear" and (trail[r][1][a])[2] == '0')):
+                    #print((trail[r][1][a]))
+                    #print((trail[r][1][a])[1])
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='red')
+                #Fourth arrow:
+                if((type == "Differential" and bin[pBox[4*a+3]] == 0) or (type == "Linear" and (trail[r][1][a])[3] == '0')):
+                    #print("here4")
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='blue')
+                else:
+                    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='red')
 
                 #If it is not differential, do the following (just as before I touched the code)
                 #else:
@@ -277,18 +291,27 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
 
                 if(type == "Linear"):
                     #TODO stop text moving
-                    arrow1_canvas.create_text(width/2+110, end_arrow+50, text="Corrolation of round: " + str(trail[r][0]))
+                    arrow1_canvas.create_text(width/2+110, end_arrow+50, text="Corrolation of round: " + str(round(trail[r][0],2)))
 
             else:
-                #output
-                #arrow1_canvas.create_text(width/2, end_arrow+50, text="Output")
+                
 
                 if(type == "Differential"):
                     arrow1_canvas.create_text(width/2, end_arrow+50, text=trail[len(trail)-1])
 
                 if(type == "Linear"):
                     #TODO stop text moving
-                    arrow1_canvas.create_text(width/2, end_arrow+50, text="Total corrolation: "+ str(totalCorr))
+                    stop_prop = math.log(2.0**(-(16/2)), 2.0)
+                    #print(stop_prop)
+                    if (totalCorr < stop_prop):
+                        arrow1_canvas.create_text(width/2, end_arrow+50, text="This is not an efficient attack, the correlation is too low")
+                    else:
+                        arrow1_canvas.create_text(width/2, end_arrow+50, text="Total corrolation: "+ str(round(totalCorr,2)))
+                    #output
+                    m = ''.join(sboxMasks[-1])
+                    arrow1_canvas.create_text(width/2, end_arrow+100, text="Output Mask: " + str(m))
+                    complexity = (totalCorr ** (-2.0))
+                    arrow1_canvas.create_text(width/2, end_arrow+130, text="Complexity " + str(complexity))
 
                 end_y = (r+1)*end_arrow+200
                 #arrow1_canvas.create_line(width/2,end_y, (width/10),width/2, end_y + 40,arrow=tk.LAST)
