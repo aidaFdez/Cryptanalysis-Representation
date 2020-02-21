@@ -130,9 +130,9 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
         print(sboxMasks)
         #print(inputString)
         print(trail)
-        totalCorr = 1
+        totalCorr = 0
         for r in trail: 
-            totalCorr = totalCorr * r[0]
+            totalCorr = totalCorr + r[0]
         print(totalCorr)
         #for i in range(len(trail)):
         #    print(i," ",trail[i])
@@ -161,6 +161,8 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
         arrow1_canvas.create_text(width/2, 20, text=inputString)
         arrow1_canvas.create_line(width/2,40, width/2,end_arrow,arrow=tk.LAST)
         arrow1_canvas.create_rectangle((width/10), end_arrow+20, (width-width/10), 220)
+        if (type == "Linear"):
+            arrow1_canvas.create_text(width/2 + 200, 20, text="Correlations and Complexities\n are in log base 2")
     #calculates permutation of each arrow
         positions_x = []
         for a in range(sBoxes):
@@ -213,8 +215,9 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155)
                 arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), end_arrow+130, text="S")
                 if(type == "Linear"):
-                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+110, text="mask")
-                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+130, text=sboxMasks[r][a])
+                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+130, text="mask")
+                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+150, text=trail[r][1][a])
+                    #sboxMasks[r][a])
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+110, text="Corr:")
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+130, text=trail[r][2][a])
 
@@ -244,7 +247,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 #Second arrow
                 if((type == "Differential" and bin[pBox[4*a+1]] == 0) or (type == "Linear" and (trail[r][1][a])[1] == '0')):
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='blue')
-                    #print(("here2" + trail[r][1][a])[1] )
+                   # print("here2" + (trail[r][1][a]) )
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
                 #Third arrow
@@ -263,14 +266,14 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
 
                 #If it is not differential, do the following (just as before I touched the code)
                 #else:
-                #    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST)
-                #    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='green')
-                #    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
+                #arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST)
+                #arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='green')
+                #arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
 
                 #print(str(4*a+3))
                 #print("pbox " + str(pBox[4*a+3]))
                 #print("positions_x "+str(positions_x[pBox[4*a+3]]))
-                #    arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
+                #arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
             #output box
             arrow1_canvas.create_rectangle((width/10), end_arrow+325, (width-width/10), end_arrow+375)
             end_arrow = end_arrow+300
@@ -292,6 +295,9 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 if(type == "Linear"):
                     #TODO stop text moving
                     arrow1_canvas.create_text(width/2+110, end_arrow+50, text="Corrolation of round: " + str(round(trail[r][0],2)))
+                    pMask = ''.join(sboxMasks[r])
+                    arrow1_canvas.create_text(width/2-150, end_arrow+50, text="Permuted mask " + str(pMask))
+
 
             else:
                 
@@ -310,7 +316,8 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                     #output
                     m = ''.join(sboxMasks[-1])
                     arrow1_canvas.create_text(width/2, end_arrow+100, text="Output Mask: " + str(m))
-                    complexity = (totalCorr ** (-2.0))
+                    complexity = ((2**totalCorr) ** (-2.0))
+                    complexity = math.log(complexity, 2)
                     arrow1_canvas.create_text(width/2, end_arrow+130, text="Complexity " + str(complexity))
 
                 end_y = (r+1)*end_arrow+200
