@@ -81,8 +81,6 @@ def showLAT(wn, sbox):
             else:
                 prob = tk.Label(lanfr,text =lat2[i][j], relief=tk.RIDGE, width=10, bg = 'LightSkyBlue1')
             prob.grid(row = i+1, column = j+1)
-            #if not(lat[i][j] == lat2[i][j]):
-            #    print("The one in ", i, ", ", j, " is different")
 
 #Variables to keep the trails and probabilities
 trail = []
@@ -90,7 +88,6 @@ probs = []
 def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
 
     wdw =tk.Tk()
-    #print(inputString)
 
     if(type == "Differential"):
         bt = tk.Button(wdw, text = "Difference distribution table", command = lambda: showDdft(wdw, sBox))
@@ -123,19 +120,11 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 permutedMask.append(tempMask[pBox.index(n)]) 
             inputString = ''.join(permutedMask)
             sboxMasks.append([inputString[i:i+4] for i in range(0,len(inputString), 4)])
-            #print(inputString)
-        #print(trail)
-        #print(pBox)
-        #print(permutedMask)
-        print(sboxMasks)
-        #print(inputString)
-        print(trail)
+
         totalCorr = 0
         for r in trail: 
             totalCorr = totalCorr + r[0]
         print(totalCorr)
-        #for i in range(len(trail)):
-        #    print(i," ",trail[i])
 
     wdw.title("Visualisation")
 #wdw.resizable(height = True, width =True)
@@ -181,7 +170,6 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
         arrow1_canvas.create_text((width/10)-20, end_arrow+45, text="k0")
         #add linear probability for round one
         if(type == "Linear"):
-            #TODO stop text moving
             arrow1_canvas.create_text(width/2+110, end_arrow+45, text=" Corrolation of round: " + str(round(trail[0][0],2)))
 
         #loop through each round
@@ -190,7 +178,6 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 #arrows to sboxes
                 #round 1
                 if (r == 0) :
-                    #print(a, " ", r)
                     #Arrow to the left
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+75, width/(num_arrows+1)*(a+1)-20,(r+1)*end_arrow+105,arrow=tk.LAST)
                     #Arrow to the RIGHT
@@ -215,9 +202,10 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155)
                 arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), end_arrow+130, text="S")
                 if(type == "Linear"):
+                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+110, text=sboxMasks[r-1][a])
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+130, text="mask")
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+150, text=trail[r][1][a])
-                    #sboxMasks[r][a])
+
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+110, text="Corr:")
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+130, text=trail[r][2][a])
 
@@ -240,26 +228,21 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
             
                 #First arrow
                 if((type == "Differential" and bin[pBox[4*a]] == 0) or (type == "Linear" and (trail[r][1][a])[0] == '0')):
-                    #print("here1")
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST, fill = 'blue')
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST, fill = 'red')
                 #Second arrow
                 if((type == "Differential" and bin[pBox[4*a+1]] == 0) or (type == "Linear" and (trail[r][1][a])[1] == '0')):
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='blue')
-                   # print("here2" + (trail[r][1][a]) )
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
                 #Third arrow
                 if((type == "Differential" and bin[pBox[4*a+2]] == 0) or (type == "Linear" and (trail[r][1][a])[2] == '0')):
-                    #print((trail[r][1][a]))
-                    #print((trail[r][1][a])[1])
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='red')
                 #Fourth arrow:
                 if((type == "Differential" and bin[pBox[4*a+3]] == 0) or (type == "Linear" and (trail[r][1][a])[3] == '0')):
-                    #print("here4")
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='blue')
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='red')
