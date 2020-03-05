@@ -6,7 +6,7 @@ import re
 
 
 if __name__ == '__main__':
-    print("ENTERED")
+    #print("ENTERED")
     #Pass the differential values automatically, no need to input them everytime.
     if len(sys.argv)>1:
         pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
@@ -143,7 +143,7 @@ def popupmsg(msg):
 def create():
     #Get the input string
     inputString = input.get()
-    
+
 
     #check linear/differential selected
     if(not type.get()):

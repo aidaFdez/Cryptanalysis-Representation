@@ -1,5 +1,6 @@
 #Pattern matching library
 import re
+import sys
 
 #Compute the Differential Distribution Table
 def diffDistTable(sbox):
@@ -22,14 +23,19 @@ def diffDistTable(sbox):
     return ddt
 
 def diffTrail(sbox, data, ddt, pbox, rounds):
+    #print("The data is ", data)
     #Get the data in numbers
     str = getInts(data)
     #Populate the trail changes, calculate the most probable transformation.
     trail = []
     #Keep the probability of the round respect the previous one
     probabilities = []
+    general_prob = 1
+    r = 0
 
-    for r in range(rounds):
+    while (general_prob >= 2**(-16)):
+
+    #for r in range(rounds):
         #print("In round ", r)
         #If it is the first round, do it from the input
         if(r==0):
@@ -39,38 +45,39 @@ def diffTrail(sbox, data, ddt, pbox, rounds):
                 value, probability = highProb(val, ddt)
                 #Save the trail value
                 vals.append(value)
-                #print(val, " has match ", value, " with probability ", probability/(len(data)*4))
                 #Update the probability of that specific trail
                 prob = prob* (probability/16)
-            #print("values are ", vals)
+            #print(vals, " Values before swapping")
             #Need to apply the permutation to the values:
             swapped = pBoxSwaps(pbox, vals)
-            #print("probability of this round is ", probability)
+            #print(swapped, " Values after swapping")
             trail.append(swapped)
             #Save the probability of this round
             probabilities.append(prob)
+            general_prob = general_prob*prob
         #If it is not the first round, do it from what was left before
         else:
-            #print("entered else")
-            print(trail)
             vals = []
             prob = 1
             #Same as before, but taking the previous ones as base
-            print(trail[r-1])
             for val in trail[r-1]:
-                print(val)
+                #print(val)
                 value, probability = highProb(val, ddt)
-                #print(val, " has match ", value, " with probability ", probability, " (2)")
+                #print(val, " has match ", value, " with probability ", probability)
                 vals.append(value)
                 prob = prob* (probability/16)
             swapped = pBoxSwaps(pbox, vals)
             #print("values are ", vals)
             #Save the probability of this round
             probabilities.append(prob)
+            general_prob = general_prob*prob
             trail.append(swapped)
-    print("************", trail)
-    print("************", probabilities)
-    return trail, probabilities
+        r = r+1
+    #print("************", trail)
+    #print("************", probabilities)
+    print("Useful until round ", len(trail), " with probability ", general_prob)
+    #print(2**(-16))
+    return trail, probabilities, general_prob
 
 #Do the swaps according to the pBox
 def pBoxSwaps(pBox, input):
@@ -111,6 +118,7 @@ def pBoxSwaps(pBox, input):
         new_diff.extend(fromBinary(num))
         #print(new_diff, " extended")
     #print("************Exiting PBOX*********")
+    #print(new_diff, " extended -------------------------------")
     return new_diff
 
 def getBinary(c):
@@ -130,7 +138,11 @@ def getBinary(c):
     if (c == 13 or c == 'D'): return [1,0,1,1]
     if (c == 14 or c == 'E'): return [0,1,1,1]
     if (c == 15 or c == 'F'): return [1,1,1,1]
-    else: print("FAILEEED")
+    else:
+        try:
+            sys.exit(0)
+        except SystemExit:
+            print ("The numbers were not correct, so no match could be found")
 
 def fromBinary(c):
     if (c == [0,0,0,0]): return [0]
@@ -162,18 +174,22 @@ def highProb(input, ddt):
         #Hamming heuristic
         if(value == prob):
             #Add all the numbers, the shortest one has less 0s
-            valCount = sum(getBinary(value))
-            numCount = sum(getBinary(num))
+            valCounter = sum(getBinary(value))
+            numCounter = sum(getBinary(num))
+            #print("Before ", num)
             #If the value is smaller, then get that
-            if (valCount < numCount):
+            if (valCounter < numCounter):
                 prob = value
                 num = numCount
+            #print("After ", num, " ", prob)
+
         if (value > prob):
             #If the value is bigger than the one before, then keep that one in mind
             prob = value
             num = numCount
         #Keep track of the iteration we are in
         numCount = numCount+1
+    #print("***** Changed ", input, " to ", num)
     #Return the index of the most probable, ie: the one it gets substituted for
     return num, prob
 
@@ -218,8 +234,5 @@ def vals_string(vals):
     return stn
 
 
-#TODO Divide the input, so it has the correct sizes. How do we pad the ones that are not long enough?
-
-#TODO Each arrow can show the difference probability when clicked? Show as a table with what difference before and difference afterwards
-
-#TODO Understand how to use the outut in more than one round
+#TODO Log 2, boton de cambiar, cambios simples, complejidad (opuesto probabilidad) seria nº textos elegidos necesarios, total probabilidad acumulada
+#Hecho mirar las flechas,
