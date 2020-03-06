@@ -3,6 +3,7 @@ import diff
 import lin
 import math
 from decimal import Decimal
+import sys
 
 #Variables to keep the trails and probabilities
 trail = []
@@ -95,7 +96,7 @@ def popupmsg(title, msg, wn):
     fr.pack()
     label.pack(side="top", fill="x", pady=10)
 
-def diff_edition(wn, round, sbox, pbox, numRounds, tr, pbs):
+def diff_edition(wn, round, sbox, pbox, numRounds, tr, pbs, inputString):
     #Set up of the window to be used for the input
     edit_window = tk.Toplevel(wn)
     print(round)
@@ -112,13 +113,42 @@ def diff_edition(wn, round, sbox, pbox, numRounds, tr, pbs):
         #old_prob_fin = diff.diffTrail(sbox, inputString, diff.diffDistTable(sbox), pbox, numRounds)
         #print(new_diff)
         new_round = diff.getInts(new_diff)
-        print((old_trail))
-        old_round = old_trail[round]
-        print(old_round)
-        print(old_trail[round-1])
+        print((old_trail), " This is the old trail")
+        old_round = old_trail[round-1]
+        print(old_round, " This is the old round")
+        print(old_trail[round-1], " This is the previous of the old round")
         #Get the data from the new input
         new_trail, new_probs, new_fin_prob = diff.diffTrail(sbox, new_diff, diff.diffDistTable(sbox), pbox, numRounds)
-        print(new_trail)
+        print(new_trail, " This is the new trail")
+        new_prob = 1
+        ddt = diff.diffDistTable(sbox)
+        #Calculate the probability with the edited round
+        """for i in old_round:
+            for j in new_round:"""
+        for i in range(4):
+            old = old_round[i]
+            new = new_round[i]
+            pr = ddt[old][new]
+            print("Probability of ", old, " to ", new, " is ", pr)
+            if(pr == 0):
+                print("Probability of ", old, " to ", new, " is 0")
+                sys.exit()
+
+            new_prob = new_prob* (pr/16)
+
+        final_trail = []
+        final_trail.extend(old_trail[:round])
+        final_trail.append(new_round)
+        final_trail.extend(new_trail)
+        final_probs = []
+        final_probs.extend(old_probs[:round])
+        final_probs.append(new_prob)
+        final_probs.extend(new_probs)
+        print(final_probs)
+        fin_prob = 1
+        for pr in final_probs:
+            fin_prob = fin_prob*pr
+        visual(inputString, 2, numRounds, len(inputString), sbox, pbox, "Differential", False, final_trail, final_probs, fin_prob)
 
 
     bt = tk.Button(edit_window, text = "Ok", command = change)
@@ -136,8 +166,7 @@ def calculate_diff(sBox, inputString, pBox, numOfRounds, wdw):
         popupmsg("Number of rounds",("You chose " + str(prev) + " but it is efficient to calculate up to " + str(len(trail)) + ", so this was used"), wdw )
     return trail, probs, prob_fin
 
-
-def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first, tr, pbs):
+def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first, tr, pbs, p_fin):
 
     wdw =tk.Tk()
 
@@ -146,6 +175,8 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
     if(type == "Differential" and not first):
         trail = tr
         probs = pbs
+        prob_fin = p_fin
+
         """for i in range(len(trail)):
             print(i," ",trail[i])"""
 
@@ -337,6 +368,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
 
                 #The text with the round
                 if(type == "Differential"):
+                    #print(probs[r])
                     pr = Decimal(math.log2(probs[r]))
                     arrow1_canvas.create_text(width/2+100, end_arrow+50, text=(diff.vals_string(trail[r])+" P (log2)= "+str(round(pr,3))))
                     #probability up to this point
@@ -351,7 +383,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                     #edit = tk.Button(arrow1_canvas)
                     #edit.place(x=19*width/20, y=end_arrow+50)
                     #edit.pack()
-                    button1 = tk.Button(text = "Edit round", anchor = tk.W, command = lambda r =r: diff_edition(wdw, r, sBox, pBox, numOfRounds, trail, probs))
+                    button1 = tk.Button(master = arrow1_canvas,text = "Edit round", anchor = tk.W, command = lambda r =r: diff_edition(wdw, r, sBox, pBox, numOfRounds, trail, probs, inputString))
                     button1_window = arrow1_canvas.create_window(width/3-15, end_arrow+39, anchor=tk.NW, window=button1)
 
 

@@ -16,12 +16,12 @@ if __name__ == '__main__':
             #sBox = [1,2,3,0, 5, 6, 7, 4]
             #pBox = [2,3,0,1, 5, 6, 7, 4, 9, 10, 11, 8]
             #000f
-            visual.visual("000f", 2, 7,len("000f") , sBox, pBox, "Differential", True, [],[])
+            visual.visual("000f", 2, 7,len("000f") , sBox, pBox, "Differential", True, [],[],1)
             exit()
         if sys.argv[1] == "lin":
             sBox = [15,14,11,12,6,13,7,8,0,3,9,10,4,2,1,5]
             pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
-            visual.visual("0000110011110011", 2, 2, 4, sBox, pBox, "Linear", True, [],[])
+            visual.visual("0000110011110011", 2, 2, 4, sBox, pBox, "Linear", True, [],[],1)
             exit()
 
 
@@ -205,9 +205,9 @@ def create():
     #inset output string TODO
     print(type.get())
     if(type.get() == "Linear") :
-        visual.visual(inputString, 2, rounds.get(), int(len(inputString)/4), sbox, send, type.get(), True, [],[])
+        visual.visual(inputString, 2, rounds.get(), int(len(inputString)/4), sbox, send, type.get(), True, [],[],1)
     if(type.get() == "Differential") :
-        visual.visual(inputString, 2, rounds.get(), len(inputString), sbox, send, type.get(), True, [],[])
+        visual.visual(inputString, 2, rounds.get(), len(inputString), sbox, send, type.get(), True, [],[],1)
 
 generateButton = Button(window, text = "Generate", command = create)
 generateButton.grid(row = 16, column = 0)
