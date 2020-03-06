@@ -1,6 +1,7 @@
 #Pattern matching library
 import re
 import sys
+import tkinter as tk
 
 #Compute the Differential Distribution Table
 def diffDistTable(sbox):
@@ -32,8 +33,9 @@ def diffTrail(sbox, data, ddt, pbox, rounds):
     probabilities = []
     general_prob = 1
     r = 0
-
-    while (general_prob >= 2**(-16)):
+    over_prob = False
+    #general_prob >= 2**(-16)
+    while (not over_prob):
 
     #for r in range(rounds):
         #print("In round ", r)
@@ -70,53 +72,35 @@ def diffTrail(sbox, data, ddt, pbox, rounds):
             #print("values are ", vals)
             #Save the probability of this round
             probabilities.append(prob)
-            general_prob = general_prob*prob
-            trail.append(swapped)
+            if(general_prob*prob<= 2**(-16)):
+                over_prob = True
+            else:
+                general_prob = general_prob*prob
+                trail.append(swapped)
         r = r+1
-    #print("************", trail)
-    #print("************", probabilities)
     print("Useful until round ", len(trail), " with probability ", general_prob)
-    #print(2**(-16))
     return trail, probabilities, general_prob
 
 #Do the swaps according to the pBox
 def pBoxSwaps(pBox, input):
     #print("************Entered PBOX*********")
-    #output =""
     output =[]
-    #print(input, " THE INPUT")
     #Get the binary values of the input difference
     for ch in input:
-        #output += getBinary(ch)
-        #print(ch, "CHARACTERRR")
         output.extend(getBinary(ch))
-    #print("Output is ", output)
-    #bin_output =  "0"*len(input)
     bin_output =  [0]*len(pBox)
     #Do the swaps
     for n in range(int(len(pBox))):
-        #print(n)
-        #print(int(len(pBox)), " is the range")
-        #print(pBox[n], "is the pbox value")
-        #print(output[n], "is the output value")
         bin_output[pBox[n]] = output[n]
-    #print(bin_output, " binary output")
     new_diff = []
     #That division should be the number of bits of the thingy
-    #print(len(pBox), " is the length of the pBox")
     for r in range(len(input)):
         num = []
-        #print ("Doing round ", r)
-        #print(r*4, " first r")
-        #print((r*4)+1, " second r")
         num.append(bin_output[r*4])
         num.append(bin_output[r*4+1])
         num.append(bin_output[r*4+2])
         num.append(bin_output[(r*4)+3])
-        #print(num, " this is the value")
-        #print(fromBinary(num), " received")
         new_diff.extend(fromBinary(num))
-        #print(new_diff, " extended")
     #print("************Exiting PBOX*********")
     #print(new_diff, " extended -------------------------------")
     return new_diff
@@ -233,6 +217,21 @@ def vals_string(vals):
     stn = stn+"]"
     return stn
 
+def popup(title, msg):
+    popup = tk.Tk()
+    popup.wm_title(title)
+    label = tk.Label(popup, text=msg)
+    label.pack(side="top", fill="x", pady=10)
+    #B1 = tk.Button(popup, text="Okay", command = popup.destroy)
+    #B1.pack()
+    var = tk.IntVar()
+    button = tk.Button(popup, text="Click Me", command=lambda: var.set(1))
+    button.pack()
 
-#TODO Log 2, boton de cambiar, cambios simples, complejidad (opuesto probabilidad) seria nº textos elegidos necesarios, total probabilidad acumulada
-#Hecho mirar las flechas,
+    print("waiting...")
+    button.wait_variable(var)
+    print("done waiting.")
+#("You chose " + str(numOfRounds) + " but it is efficient to calculate up to " + str(len(trail)) + ", so this was used")
+
+#TODO boton de cambiar, cambios simples,
+#Hecho mirar las flechas,Log 2, complejidad (opuesto probabilidad) seria nº textos elegidos necesarios, total probabilidad acumulada

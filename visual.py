@@ -4,6 +4,9 @@ import lin
 import math
 from decimal import Decimal
 
+#Variables to keep the trails and probabilities
+trail = []
+probs = []
 
 
 #Difference distribution table hardcoded
@@ -83,17 +86,66 @@ def showLAT(wn, sbox):
                 prob = tk.Label(lanfr,text =lat2[i][j], relief=tk.RIDGE, width=10, bg = 'LightSkyBlue1')
             prob.grid(row = i+1, column = j+1)
 
-#Variables to keep the trails and probabilities
-trail = []
-probs = []
-def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
+#For popping up useful messages
+def popupmsg(title, msg, wn):
+    popup = tk.Toplevel(wn)
+    popup.wm_title(title)
+    label = tk.Label(popup, text=msg)
+    fr = tk.Frame(popup)
+    fr.pack()
+    label.pack(side="top", fill="x", pady=10)
+
+def diff_edition(wn, round, sbox, pbox, numRounds, tr, pbs):
+    #Set up of the window to be used for the input
+    edit_window = tk.Toplevel(wn)
+    print(round)
+    info = tk.Label(edit_window, text="Write new difference")
+    info.grid(column = 0, row = 0)
+    input = tk.Entry(edit_window)
+    input.grid(row = 1, column=0)
+
+    #function to be called by the button to change all the data
+    def change():
+        new_diff = input.get()
+        old_trail = tr
+        old_probs = pbs
+        #old_prob_fin = diff.diffTrail(sbox, inputString, diff.diffDistTable(sbox), pbox, numRounds)
+        #print(new_diff)
+        new_round = diff.getInts(new_diff)
+        print((old_trail))
+        old_round = old_trail[round]
+        print(old_round)
+        print(old_trail[round-1])
+        #Get the data from the new input
+        new_trail, new_probs, new_fin_prob = diff.diffTrail(sbox, new_diff, diff.diffDistTable(sbox), pbox, numRounds)
+        print(new_trail)
+
+
+    bt = tk.Button(edit_window, text = "Ok", command = change)
+    bt.grid(row=2, column=0)
+
+def calculate_diff(sBox, inputString, pBox, numOfRounds, wdw):
+    bt = tk.Button(wdw, text = "Difference distribution table", command = lambda: showDdft(wdw, sBox))
+    bt.pack()
+    trail, probs, prob_fin = diff.diffTrail(sBox, inputString, diff.diffDistTable(sBox), pBox, numOfRounds)
+    #If the number of rounds is more than the one of the trail, then more rounds were chosen than it is worth calculating
+    if(len(trail)<numOfRounds):
+        prev = numOfRounds
+        numOfRounds = len(trail)
+        #diff.popup("Number of rounds",("You chose " + str(numOfRounds) + " but it is efficient to calculate up to " + str(len(trail)) + ", so this was used"))
+        popupmsg("Number of rounds",("You chose " + str(prev) + " but it is efficient to calculate up to " + str(len(trail)) + ", so this was used"), wdw )
+    return trail, probs, prob_fin
+
+
+def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first, tr, pbs):
 
     wdw =tk.Tk()
 
-    if(type == "Differential"):
-        bt = tk.Button(wdw, text = "Difference distribution table", command = lambda: showDdft(wdw, sBox))
-        bt.pack()
-        trail, probs, prob_fin = diff.diffTrail(sBox, inputString, diff.diffDistTable(sBox), pBox, numOfRounds)
+    if(type == "Differential" and first):
+        trail, probs, prob_fin = calculate_diff(sBox, inputString, pBox, numOfRounds, wdw)
+    if(type == "Differential" and not first):
+        trail = tr
+        probs = pbs
         """for i in range(len(trail)):
             print(i," ",trail[i])"""
 
@@ -173,6 +225,8 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
 
 
         #loop through each round
+        if(num_rounds>len(trail) and type == "Differential"):
+            num_rounds = len(trail)
         for r in range(num_rounds):
             #Get the binary stuff for differential:
             if(type == "Differential"):
@@ -207,11 +261,8 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
                 #Creating the rectangle with the text
                 arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155)
                 if(type == "Linear"):
-<<<<<<< HEAD
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), end_arrow+130, text="S")
-=======
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+110, text=sboxMasks[r-1][a])
->>>>>>> d7f2086f1c9cc2cb843c08e981b9287f810f146c
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+130, text="mask")
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+150, text=trail[r][1][a])
 
@@ -286,10 +337,23 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
 
                 #The text with the round
                 if(type == "Differential"):
-                    print(probs[r])
-                    print(math.log2(probs[r]))
                     pr = Decimal(math.log2(probs[r]))
-                    arrow1_canvas.create_text(width/2+100, end_arrow+50, text=(diff.vals_string(trail[r])+" with probability (log2) "+str(round(pr,3))))
+                    arrow1_canvas.create_text(width/2+100, end_arrow+50, text=(diff.vals_string(trail[r])+" P (log2)= "+str(round(pr,3))))
+                    #probability up to this point
+                    prob_here = 1
+                    for i in range(r+1):
+                        prob_here = prob_here * probs[i]
+                    prb = Decimal(math.log2(prob_here))
+                    #print(prob_here)
+                    arrow1_canvas.create_text(19*width/20, end_arrow+50, text=(str(round(prb, 3))))
+
+                    arrow1_canvas.create_text(width/3, end_arrow+50, text="Button")
+                    #edit = tk.Button(arrow1_canvas)
+                    #edit.place(x=19*width/20, y=end_arrow+50)
+                    #edit.pack()
+                    button1 = tk.Button(text = "Edit round", anchor = tk.W, command = lambda r =r: diff_edition(wdw, r, sBox, pBox, numOfRounds, trail, probs))
+                    button1_window = arrow1_canvas.create_window(width/3-15, end_arrow+39, anchor=tk.NW, window=button1)
+
 
                 if(type == "Linear"):
                     #TODO stop text moving
@@ -302,9 +366,16 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type):
 
 
                 if(type == "Differential"):
-
-                    pr = Decimal(prob_)
-                    arrow1_canvas.create_text(width/2, end_arrow+50, text=(diff.vals_string(trail[r])+ " " +str(prob_fin)))
+                    pr = Decimal(math.log2(probs[r]))
+                    arrow1_canvas.create_text(width/2, end_arrow+50, text=(diff.vals_string(trail[r])+ " with probability (log2) " +str(round(pr, 3))))
+                    prob_here = 1
+                    for i in range(r+1):
+                        prob_here = prob_here * probs[i]
+                    prb = Decimal(math.log2(prob_here))
+                    #print(prob_here)
+                    arrow1_canvas.create_text(19*width/20, end_arrow+50, text=(str(round(prb, 3))))
+                    arrow1_canvas.create_text(width/2, end_arrow+100, text=("An attack would be efficient until round " +str(len(trail)) + " with probability (log2) " + str(math.log2(prob_fin))))
+                    arrow1_canvas.create_text(width/2, end_arrow+120, text=("The attack complexity in this number of rounds would be 2^" + str(-math.log2(prob_here))))
 
                 if(type == "Linear"):
                     #TODO stop text moving
