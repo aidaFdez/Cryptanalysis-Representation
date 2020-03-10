@@ -161,7 +161,7 @@ def diff_edition(wn, round, sbox, pbox, numRounds, tr, pbs, inputString):
         print(final_trail[round])
         fin_prob = 1
         for pr in final_probs:
-            fin_prob = fin_prob*pr
+            fin_prob = fin_prob*prvisual
         visual(inputString, 2, numRounds, len(inputString), sbox, pbox, "Differential", False, final_trail, final_probs, fin_prob)
 
 
@@ -178,13 +178,36 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
     input.grid(row = 1, column=0)
 
     #function to change the linear data
-    def change():
+    def change(wn):
+        #convert to tuples to list to be able to modify
+        temptrail = [list(elem) for elem in trail]
+        #get new input mask
         new_inp = input.get()
-        print(round)
-        #new_mask = 
-        #for i in range 
-        print(sboxMasks, "sboxMasks")
-        #print(trail, "trail")
+        #update mask
+        sboxMasks[round][sboxnumber] = new_inp
+        #update correlation
+        temptrail[round][2][sboxnumber] = lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)]
+        #calculate the total correlation
+        totcorr = sum(temptrail[round][2])
+        #print(temptrail[round][0])
+        #trail[round][0] = list(trail[round][0])
+        temptrail[round][0] = totcorr
+        #trail[round][0] = tuple(trail[round][0])
+        #print(temptrail[round][0])
+
+        #convert back to a list
+        newtrail = [tuple(l) for l in temptrail]
+
+        #print(newtrail)
+ 
+
+        totalCorr = 0
+        for r in temptrail:
+            totalCorr = totalCorr + r[0]
+
+        #print(totalCorr)
+        visual(inputString, 2, numRounds, int(len(inputString)/4), sbox, pbox, "Linear", False, newtrail, sboxMasks, totalCorr)
+
 
     bt = tk.Button(edit_window, text = "Ok", command = change)
     bt.grid(row=2, column=0)
@@ -254,6 +277,10 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
         #print(trail)
         #print(sboxMasks)
         #print(totalCorr)
+    if (type == "Linear" and not first):
+        trail = tr
+        sboxMasks = pbs
+        totalCorr = p_fin
 
 
     wdw.title("Visualisation")
@@ -336,7 +363,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
 
                 #sboxes
                 #Creating the rectangle with the text
-                if(probs[r]>0):
+                if(type == "Linear" or probs[r]>0):
                     arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155)
                 else:
                     arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155, outline="red")
@@ -453,7 +480,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                     arrow1_canvas.create_text(width/2-150, end_arrow+50, text="Permuted mask " + str(pMask))
                     #print(trail)
                     for i in range(4):
-                        button1 = tk.Button(master = arrow1_canvas,text = "Edit", anchor = tk.W, command = lambda r =r: lin_edition(wdw, r+1, i, sBox, pBox, numOfRounds, trail, sboxMasks, totalCorr, inputString))
+                        button1 = tk.Button(master = arrow1_canvas,text = "Edit", anchor = tk.W, command = lambda r =r, i=i: lin_edition(wdw, r+1, i, sBox, pBox, numOfRounds, trail, sboxMasks, totalCorr, inputString))
                         button1.pack()
                         button1_window = arrow1_canvas.create_window(width/(num_arrows+1)*(i+1) - 120, end_arrow+100, anchor=tk.NW, window=button1)
 

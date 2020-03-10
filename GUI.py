@@ -21,7 +21,7 @@ if __name__ == '__main__':
         if sys.argv[1] == "lin":
             sBox = [15,14,11,12,6,13,7,8,0,3,9,10,4,2,1,5]
             pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
-            visual.visual("0000110011110011", 2, 6, 4, sBox, pBox, "Linear", True, [],[],1)
+            visual.visual("0000110011110011", 2, 2, 4, sBox, pBox, "Linear", True, [],[],1)
             exit()
 
 
