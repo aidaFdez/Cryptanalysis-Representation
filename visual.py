@@ -107,52 +107,65 @@ def diff_edition(wn, round, sbox, pbox, numRounds, tr, pbs, inputString):
     input.grid(row = 1, column=0)
 
     #function to be called by the button to change all the data
-    def change():
+    def change(wn):
         new_diff = input.get()
         old_trail = tr
         old_probs = pbs
         #old_prob_fin = diff.diffTrail(sbox, inputString, diff.diffDistTable(sbox), pbox, numRounds)
         #print(new_diff)
         new_round = diff.getInts(new_diff)
-        print((old_trail), " This is the old trail")
+        #print((old_trail), " This is the old trail")
         old_round = old_trail[round-1]
-        print(old_round, " This is the old round")
-        print(old_trail[round-1], " This is the previous of the old round")
+        next_round = old_trail[round+1]
+        #print(old_round, " This is the old round")
+        #print(old_trail[round-1], " This is the previous of the old round")
         #Get the data from the new input
-        new_trail, new_probs, new_fin_prob = diff.diffTrail(sbox, new_diff, diff.diffDistTable(sbox), pbox, numRounds)
-        print(new_trail, " This is the new trail")
+        #new_trail, new_probs, new_fin_prob = diff.diffTrail(sbox, new_diff, diff.diffDistTable(sbox), pbox, numRounds)
+        #print(new_trail, " This is the new trail")
         new_prob = 1
         ddt = diff.diffDistTable(sbox)
         #Calculate the probability with the edited round
         """for i in old_round:
             for j in new_round:"""
         for i in range(4):
+            #Check it works with the previous round
             old = old_round[i]
             new = new_round[i]
             pr = ddt[old][new]
             print("Probability of ", old, " to ", new, " is ", pr)
             if(pr == 0):
                 print("Probability of ", old, " to ", new, " is 0")
-                sys.exit()
+                popupmsg("Zero probability",("Probability of ", old, " to ", new, " is 0"),wn )
+            #Check it works with the next round
+            old_n = next_round[i]
+            new_n = new_round[i]
+            pr_n = ddt[new_n][old_n]
+            print("Probability of ", new_n, " to ", old_n, " is ", pr_n)
+            if(pr_n == 0):
+                print("Probability of ", old, " to ", new, " is 0")
+                popupmsg("Zero probability", ("Probability of ", new_n, " to ", old_n, " is ", pr_n),wn)
 
             new_prob = new_prob* (pr/16)
 
-        final_trail = []
-        final_trail.extend(old_trail[:round])
-        final_trail.append(new_round)
-        final_trail.extend(new_trail)
-        final_probs = []
-        final_probs.extend(old_probs[:round])
-        final_probs.append(new_prob)
-        final_probs.extend(new_probs)
-        print(final_probs)
+        final_trail = old_trail
+        final_trail[round] = new_round
+        #final_trail.extend(old_trail[:round])
+        #final_trail.append(new_round)
+        #final_trail.extend(new_trail)
+        final_probs = old_probs
+        final_probs[round] = new_prob
+        #final_probs.extend(old_probs[:round])
+        #final_probs.append(new_prob)
+        #final_probs.extend(new_probs)
+        #print(final_probs)
+        print(final_trail[round])
         fin_prob = 1
         for pr in final_probs:
             fin_prob = fin_prob*pr
         visual(inputString, 2, numRounds, len(inputString), sbox, pbox, "Differential", False, final_trail, final_probs, fin_prob)
 
 
-    bt = tk.Button(edit_window, text = "Ok", command = change)
+    bt = tk.Button(edit_window, text = "Ok", command = lambda:change(wn))
     bt.grid(row=2, column=0)
 
 def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, totalCorr, inputString):
@@ -323,7 +336,10 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
 
                 #sboxes
                 #Creating the rectangle with the text
-                arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155)
+                if(probs[r]>0):
+                    arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155)
+                else:
+                    arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155, outline="red")
                 if(type == "Linear"):
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), end_arrow+130, text="S")
                     #print(r)
@@ -404,15 +420,21 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                 #The text with the round
                 if(type == "Differential"):
                     #print(probs[r])
-                    pr = Decimal(math.log2(probs[r]))
-                    arrow1_canvas.create_text(width/2+100, end_arrow+50, text=(diff.vals_string(trail[r])+" P (log2)= "+str(round(pr,3))))
+                    if(probs[r]>0):
+                        pr = Decimal(math.log2(probs[r]))
+                        arrow1_canvas.create_text(width/2+100, end_arrow+50, text=(diff.vals_string(trail[r])+" P (log2)= "+str(round(pr,3))))
+                    else:
+                        arrow1_canvas.create_text(width/2+100, end_arrow+50, text="Not possible")
                     #probability up to this point
                     prob_here = 1
                     for i in range(r+1):
                         prob_here = prob_here * probs[i]
-                    prb = Decimal(math.log2(prob_here))
-                    #print(prob_here)
-                    arrow1_canvas.create_text(19*width/20, end_arrow+50, text=(str(round(prb, 3))))
+                    if(prob_here>0):
+                        prb = Decimal(math.log2(prob_here))
+                        #print(prob_here)
+                        arrow1_canvas.create_text(19*width/20, end_arrow+50, text=(str(round(prb, 3))))
+                    else:
+                        arrow1_canvas.create_text(19*width/20, end_arrow+50, text="Not possible")
 
                     arrow1_canvas.create_text(width/3, end_arrow+50, text="Button")
                     #edit = tk.Button(arrow1_canvas)
@@ -448,8 +470,14 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                     prb = Decimal(math.log2(prob_here))
                     #print(prob_here)
                     arrow1_canvas.create_text(19*width/20, end_arrow+50, text=(str(round(prb, 3))))
-                    arrow1_canvas.create_text(width/2, end_arrow+100, text=("An attack would be efficient until round " +str(len(trail)) + " with probability (log2) " + str(math.log2(prob_fin))))
-                    arrow1_canvas.create_text(width/2, end_arrow+120, text=("The attack complexity in this number of rounds would be 2^" + str(-math.log2(prob_here))))
+                    if(prob_fin>0):
+                        arrow1_canvas.create_text(width/2, end_arrow+100, text=("An attack would be efficient until round " +str(len(trail)) + " with probability (log2) " + str(math.log2(prob_fin))))
+                    else:
+                        arrow1_canvas.create_text(width/2, end_arrow+100, text="No attack is possible with this settings as they are not possible")
+                    if(prob_here>0):
+                        arrow1_canvas.create_text(width/2, end_arrow+120, text=("The attack complexity in this number of rounds would be 2^" + str(-math.log2(prob_here))))
+                    else:
+                        arrow1_canvas.create_text(width/2, end_arrow+120, text="No attack is possible with this settings, so no complexity can be calculated")
 
                 if(type == "Linear"):
                     #TODO stop text moving
