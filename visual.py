@@ -188,18 +188,50 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
         #update correlation
         temptrail[round][2][sboxnumber] = lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)]
         #calculate the total correlation
-        totcorr = sum(temptrail[round][2])
+        totroundcorr = sum(temptrail[round][2])
         #print(temptrail[round][0])
         #trail[round][0] = list(trail[round][0])
-        temptrail[round][0] = totcorr
+        temptrail[round][0] = totroundcorr
         #trail[round][0] = tuple(trail[round][0])
         #print(temptrail[round][0])
+        #print(trail)
+        mask = [m for i in temptrail[round-1][1] for m in i]
+        #print(mask)
+        # recalulate previous round
+        for i in range(sboxnumber*4, (4*sboxnumber)+4):
+            #print(i)
+            x = pbox.index(i)
+            #print(x)
+            mask[x] = new_inp[i % 4]
+        tempmask = [''.join(mask[i:i+4]) for i in range (0, len(mask), 4)]
+        #print(temptrail)
+        temptrail[round-1][1] = tempmask
+
+        for i in range(numRounds):
+            temptrail[round-1][2][i] = lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)]
+        totprevroundcorr = sum(temptrail[round-1][2])
+        temptrail[round-1][0] = totprevroundcorr
+
+
+        #print(tempmask)
+        #print(mask)
+            #temptrail[round-1][1][sboxnumber][x] = new_inp[]
+
+        # inverse = [0] * len(pbox)
+        # for i, p in enumerate(pbox):
+        #     inverse[p] = i
+        # permutedMask = []
+        # mask = ''.join(temptrail[round-1][1])
+        # print(mask)
+        # for n in range(len(pbox)):
+        #     permutedMask.append(mask[pbox.index(n)])
+        #     out = ''.join(permutedMask)
+        #
+        # print(out)
 
         #convert back to a list
         newtrail = [tuple(l) for l in temptrail]
 
-        #print(newtrail)
- 
 
         totalCorr = 0
         for r in temptrail:
@@ -209,9 +241,9 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
         visual(inputString, 2, numRounds, int(len(inputString)/4), sbox, pbox, "Linear", False, newtrail, sboxMasks, totalCorr)
 
 
-    bt = tk.Button(edit_window, text = "Ok", command = change)
+    bt = tk.Button(edit_window, text = "Ok", command = lambda:change(wn))
     bt.grid(row=2, column=0)
-        
+
 
 def calculate_diff(sBox, inputString, pBox, numOfRounds, wdw):
     bt = tk.Button(wdw, text = "Difference distribution table", command = lambda: showDdft(wdw, sBox))
@@ -246,7 +278,7 @@ def calculate_lin(sBoxes, sBox, inputString, pBox, numOfRounds, wdw):
     totalCorr = 0
     for r in trail:
         totalCorr = totalCorr + r[0]
-    
+
     return trail, sboxMasks, totalCorr
 
 def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first, tr, pbs, p_fin):
@@ -467,7 +499,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                     #edit = tk.Button(arrow1_canvas)
                     #edit.place(x=19*width/20, y=end_arrow+50)
                     #edit.pack()
-                    
+
                     button1 = tk.Button(master = arrow1_canvas,text = "Edit round", anchor = tk.W, command = lambda r =r: diff_edition(wdw, r, sBox, pBox, numOfRounds, trail, probs, inputString))
                     button1_window = arrow1_canvas.create_window(width/3-15, end_arrow+39, anchor=tk.NW, window=button1)
 
