@@ -10,7 +10,6 @@ trail = []
 lintrail = []
 probs = []
 
-
 #Difference distribution table hardcoded
 ddft = [[16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,6,0,0,0,0,2,0,2,0,0,2,0,4,0],
@@ -68,9 +67,9 @@ def showDdft(wn, sbox):
             prob.grid(row = i+1, column = j+1)
             if not(ddft [i][j] == ddft2[i][j]):
                 print("The one in ", i, ", ", j, " is different")
-            #print(ddft[i][j])
 
 def showLAT(wn, sbox):
+    #Creatw window to display LAT
     lanWnw = tk.Toplevel(wn)
     lanfr = tk.Frame(lanWnw)
     lanfr.pack()
@@ -181,63 +180,46 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
     def change(wn):
         #convert to tuples to list to be able to modify
         temptrail = [list(elem) for elem in trail]
+
         #get new input mask
         new_inp = input.get()
+
         #update mask
         sboxMasks[round][sboxnumber] = new_inp
+
         #update correlation
         temptrail[round][2][sboxnumber] = lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)]
+
         #calculate the total correlation
         totroundcorr = sum(temptrail[round][2])
-        #print(temptrail[round][0])
-        #trail[round][0] = list(trail[round][0])
         temptrail[round][0] = totroundcorr
-        #trail[round][0] = tuple(trail[round][0])
-        #print(temptrail[round][0])
-        #print(trail)
+        
+
         mask = [m for i in temptrail[round-1][1] for m in i]
-        #print(mask)
         # recalulate previous round
         for i in range(sboxnumber*4, (4*sboxnumber)+4):
-            #print(i)
             x = pbox.index(i)
-            #print(x)
             mask[x] = new_inp[i % 4]
         tempmask = [''.join(mask[i:i+4]) for i in range (0, len(mask), 4)]
-        #print(temptrail)
         temptrail[round-1][1] = tempmask
 
-        for i in range(numRounds):
+        #recalculate correlations for previous round
+        for i in range(4):
             temptrail[round-1][2][i] = lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)]
+        
+        #calculate total correlation of previous round
         totprevroundcorr = sum(temptrail[round-1][2])
         temptrail[round-1][0] = totprevroundcorr
-
-
-        #print(tempmask)
-        #print(mask)
-            #temptrail[round-1][1][sboxnumber][x] = new_inp[]
-
-        # inverse = [0] * len(pbox)
-        # for i, p in enumerate(pbox):
-        #     inverse[p] = i
-        # permutedMask = []
-        # mask = ''.join(temptrail[round-1][1])
-        # print(mask)
-        # for n in range(len(pbox)):
-        #     permutedMask.append(mask[pbox.index(n)])
-        #     out = ''.join(permutedMask)
-        #
-        # print(out)
 
         #convert back to a list
         newtrail = [tuple(l) for l in temptrail]
 
-
+        #update the total correlation
         totalCorr = 0
         for r in temptrail:
             totalCorr = totalCorr + r[0]
 
-        #print(totalCorr)
+        #call visual method to display 
         visual(inputString, 2, numRounds, int(len(inputString)/4), sbox, pbox, "Linear", False, newtrail, sboxMasks, totalCorr)
 
 
@@ -262,6 +244,7 @@ def calculate_lin(sBoxes, sBox, inputString, pBox, numOfRounds, wdw):
     bt.pack()
     trail = []
     sboxMasks = []
+    #calculate the masks
     sboxMasks.append([inputString[i:i+4] for i in range(0,len(inputString), 4)])
     for corrPerRound in range(numOfRounds):
         trail.append(lin.linTrail(sBoxes, inputString, lin.linApptable(sBox)))
@@ -270,11 +253,12 @@ def calculate_lin(sBoxes, sBox, inputString, pBox, numOfRounds, wdw):
             trail[corrPerRound][1][i] = get_bin(trail[corrPerRound][1][i], 4)
         tempMask = ''.join(trail[corrPerRound][1])
         permutedMask = []
+        #find the permuted masks
         for n in range(len(pBox)):
             permutedMask.append(tempMask[pBox.index(n)])
         inputString = ''.join(permutedMask)
         sboxMasks.append([inputString[i:i+4] for i in range(0,len(inputString), 4)])
-
+    #calculate the correlation
     totalCorr = 0
     for r in trail:
         totalCorr = totalCorr + r[0]
@@ -293,40 +277,21 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
         probs = pbs
         prob_fin = p_fin
 
-        """for i in range(len(trail)):
-            print(i," ",trail[i])"""
-
-    """def __init__(self,inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox):
-        self.inputString = inputString
-        self.numOfBits = numOfBits
-        self.numOfRounds = numOfRounds
-        self.sBoxes = sBoxes
-        self.sBox = sBox
-        self.pBox = pBox"""
-    # TODO check trail values
     if(type == "Linear" and first):
         trail, sboxMasks, totalCorr = calculate_lin(sBoxes, sBox, inputString, pBox, numOfRounds, wdw)
-        #print(trail)
-        #print(sboxMasks)
-        #print(totalCorr)
+
     if (type == "Linear" and not first):
+        #assigment the variables for linear
         trail = tr
         sboxMasks = pbs
         totalCorr = p_fin
 
 
     wdw.title("Visualisation")
-#wdw.resizable(height = True, width =True)
-#wdw.geometry('300x400')
+
     scrollbar = tk.Scrollbar(wdw)
     scrollbar.pack(side = tk.RIGHT, fill = tk.Y)
 
-#inputString = "aa"
-#numOfBits = 8
-#numOfRounds = 5
-#sBoxes = 4
-#sBox = [6,4,'C',5,0,7,2,'E',1,'F',3,'D',8,'A',9,'B']
-#pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
     end_y = 0
 
     def configure(event, num_arrows, num_rounds):
@@ -335,12 +300,14 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
         height = wdw.winfo_height()
         width = wdw.winfo_width()
         length_box =(width-width/5)
+
     #input
         arrow1_canvas.create_text(width/2, 20, text=inputString)
         arrow1_canvas.create_line(width/2,40, width/2,end_arrow,arrow=tk.LAST)
         arrow1_canvas.create_rectangle((width/10), end_arrow+20, (width-width/10), 220)
         if (type == "Linear"):
             arrow1_canvas.create_text(width/2 + 200, 20, text="Correlations and Complexities\n are in log base 2")
+
     #calculates permutation of each arrow
         positions_x = []
         for a in range(sBoxes):
@@ -355,10 +322,10 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
         arrow1_canvas.create_line(width/2,end_arrow+25 , width/2, end_arrow+65)
         arrow1_canvas.create_line((width/10)-15,end_arrow+45, (width/10),end_arrow+45,arrow=tk.LAST)
         arrow1_canvas.create_text((width/10)-20, end_arrow+45, text="k0")
+
         #add linear probability for round one
         if(type == "Linear"):
             arrow1_canvas.create_text(width/2+110, end_arrow+45, text=" correlation of round: " + str(round(trail[0][0],2)))
-
 
         #loop through each round
         if(num_rounds>len(trail) and type == "Differential"):
@@ -401,8 +368,6 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                     arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155, outline="red")
                 if(type == "Linear"):
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), end_arrow+130, text="S")
-                    #print(r)
-                    #print(sboxMasks[r])
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+110, text=sboxMasks[r][a])
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+130, text="mask")
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+150, text=trail[r][1][a])
@@ -417,16 +382,6 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                     else:
                         w = trail[r-1][a]
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), end_arrow+130, text=( str(w) + "\nS\n" + str(diff.fromBinary([bin[a%4],bin[a%4+4], bin[a%4+8], bin[a%4+12]])[0])))
-                #arrows from s boxes
-                #left arrow
-                #print("*********************************")
-                #print(a)
-                #print(4*a)
-                #print(pBox[4*a])
-                #print(positions_x[pBox[4*a]])
-
-                #make green arrows for 0s, red for 1sgit push --set-upstream origin master
-                #if(type == "Differential"):
 
                 #First arrow
                 if((type == "Differential" and bin[pBox[4*a]] == 0) or (type == "Linear" and (trail[r][1][a])[0] == '0')):
@@ -440,32 +395,18 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='red')
                 #Third arrow
                 if((type == "Differential" and bin[pBox[4*a+2]] == 0) or (type == "Linear" and (trail[r][1][a])[2] == '0')):
-                    #print((trail[r][1][a]))
-                    #print((trail[r][1][a])[1])
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST,fill='blue')
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST,fill='red')
                 #Fourth arrow:
                 if((type == "Differential" and bin[pBox[4*a+3]] == 0) or (type == "Linear" and (trail[r][1][a])[3] == '0')):
-                    #print("here4")
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST, fill='blue')
                 else:
                     arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST, fill='red')
 
-                #If it is not differential, do the following (just as before I touched the code)
-                #else:
-                #arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-20,end_arrow+155, positions_x[pBox[4*a]], end_arrow+325,arrow=tk.LAST)
-                #arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+20,end_arrow+155, positions_x[pBox[4*a+1]],end_arrow+325,arrow=tk.LAST, fill='green')
-                #arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)-7,end_arrow+155, positions_x[pBox[4*a+2]],end_arrow+325,arrow=tk.LAST, fill='red')
-
-                #print(str(4*a+3))
-                #print("pbox " + str(pBox[4*a+3]))
-                #print("positions_x "+str(positions_x[pBox[4*a+3]]))
-                #arrow1_canvas.create_line(width/(num_arrows+1)*(a+1)+7,end_arrow+155, positions_x[pBox[4*a+3]],end_arrow+325,arrow=tk.LAST,fill='blue')
             #output box
             arrow1_canvas.create_rectangle((width/10), end_arrow+325, (width-width/10), end_arrow+375)
             end_arrow = end_arrow+300
-
 
             #If it's not the last one, then draw the XOR and put the entering values
             if (r != num_rounds-1) :
@@ -507,10 +448,9 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                 if(type == "Linear"):
                     #TODO stop text moving
                     arrow1_canvas.create_text(width/2+110, end_arrow+50, text="correlation of round: " + str(round(trail[r][0],2)))
-                    #print("r", r)
                     pMask = ''.join(sboxMasks[r+1])
                     arrow1_canvas.create_text(width/2-150, end_arrow+50, text="Permuted mask " + str(pMask))
-                    #print(trail)
+
                     for i in range(4):
                         button1 = tk.Button(master = arrow1_canvas,text = "Edit", anchor = tk.W, command = lambda r =r, i=i: lin_edition(wdw, r+1, i, sBox, pBox, numOfRounds, trail, sboxMasks, totalCorr, inputString))
                         button1.pack()
@@ -541,7 +481,6 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                 if(type == "Linear"):
                     #TODO stop text moving
                     stop_prop = math.log(2.0**(-(16/2)), 2.0)
-                    #print(stop_prop)
                     if (totalCorr < stop_prop):
                         arrow1_canvas.create_text(width/2, end_arrow+50, text="This is not an efficient attack, the correlation is too low")
                     else:
@@ -554,25 +493,10 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                     arrow1_canvas.create_text(width/2, end_arrow+130, text="Complexity " + str(complexity))
 
                 end_y = (r+1)*end_arrow+200
-                #arrow1_canvas.create_line(width/2,end_y, (width/10),width/2, end_y + 40,arrow=tk.LAST)
-                        #input_frame = tk.Frame(width=768, height=576,bg="", master = wdw, colormap="new")
-                        #input_frame.pack()
-                        #input_label = tk.Label(input_frame, text="Input = "+ inputString)
-                        #input_label.pack()
 
     arrow1_canvas = tk.Canvas(wdw, yscrollcommand = scrollbar.set, scrollregion=(0,0,(numOfRounds+1)*300, (numOfRounds+1)*300))
     arrow1_canvas.pack(fill=tk.BOTH, expand = 1)
 
-                        # height = wdw.winfo_height()
-                        # width = wdw.winfo_width()
-                        # print(height)
-                        # print(width)
-
-                        # arr=arrow1_canvas.create_line(width/2,40, width/2,300,arrow=tk.LAST)
-                        # arrow1_canvas.coords(arr, (384, 40, 384 , 200))
-                        #lambda event, a=10, b=20, c=30:
-                            #self.rand_func(a, b, c)
-                            #https://stackoverflow.com/questions/7299955/tkinter-binding-a-function-with-arguments-to-a-wid
     arrow1_canvas.bind("<Configure>", lambda event, num_arrows = sBoxes, num_rounds=numOfRounds: configure(event,sBoxes, numOfRounds))
     scrollbar.config(command=arrow1_canvas.yview)
     wdw.mainloop()

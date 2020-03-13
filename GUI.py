@@ -6,7 +6,6 @@ import re
 
 
 if __name__ == '__main__':
-    #print("ENTERED")
     #Pass the differential values automatically, no need to input them everytime.
     if len(sys.argv)>1:
         pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
@@ -18,10 +17,11 @@ if __name__ == '__main__':
             #000f
             visual.visual("000f", 2, 7,len("000f") , sBox, pBox, "Differential", True, [],[],1)
             exit()
+    #Pass the linear values automatically, no need to input them everytime.
         if sys.argv[1] == "lin":
             sBox = [15,14,11,12,6,13,7,8,0,3,9,10,4,2,1,5]
             pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
-            visual.visual("0000110011110011", 2, 2, 4, sBox, pBox, "Linear", True, [],[],1)
+            visual.visual("0000110011110011", 2, 6, 4, sBox, pBox, "Linear", True, [],[],1)
             exit()
 
 
@@ -50,34 +50,18 @@ input = Entry(window, width = 10)
 input.grid(row = 6, column=0)
 
 #choosing number of S-box
-#TODO get the number of bits, the length of the sbox depends on it
 sbox = []
 entries = []
 entry_titles = []
-    #while j<boxes.get():
 for i in range(1,17):
     Label(text = i-1, relief=RIDGE, width=10).grid(row = 11, column=i)
-    #entry_titles.append(et)
     ent = Entry(width = 10)
     ent.grid(row = 12, column=i)
     entries.append(ent)
-    #j +=1
-    """cell.grid(row =0,column= i)
-for i in range(0,17):
-    ent = Entry(table, text="")
-    ent.grid(row = 1, column = i)
-#table.pack()"""
 
 #pBox
 pBox = []
 pentry_titles = []
-    #while j<boxes.get():
-"""for i in range(1,4*boxes.get()):
-    Label(text = i-1, relief=RIDGE, width=10).grid(row = 12, column=i)
-    #entry_titles.append(et)
-    ent = Entry(width = 10)
-    ent.grid(row = 13, column=i)
-    pBox.append(ent.get())"""
 
 def createPbox(self):
     j = 0
@@ -112,11 +96,6 @@ boxpopupMenu.grid(row = 10, column = 0)
 height = 2
 width = 8
 cells = {}
-#for i in range(height): #rows
-#    for j in range(width): #columns
-#        b = Entry(window, text="")
-#        b.grid(row = i+9, column = j )
-#        cells[(i,j)]=b
 table = Frame(window)
 
 Label(text = "x", relief=RIDGE, width=10).grid(row = 11, column=0)
@@ -127,8 +106,6 @@ Label(text = "S[x]", relief=RIDGE, width=10).grid(row = 12, column=0)
 def printSbox():
     for en in entries:
         number = en.get()
-        #if (number != ""):
-            #print(number)
 
 def popupmsg(msg):
     popup = Tk()
@@ -143,7 +120,6 @@ def popupmsg(msg):
 def create():
     #Get the input string
     inputString = input.get()
-
 
     #check linear/differential selected
     if(not type.get()):
@@ -201,9 +177,6 @@ def create():
             return
         sbox.append(int(en.get()))
 
-
-    #inset output string TODO
-    print(type.get())
     if(type.get() == "Linear") :
         visual.visual(inputString, 2, rounds.get(), int(len(inputString)/4), sbox, send, type.get(), True, [],[],1)
     if(type.get() == "Differential") :
