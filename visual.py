@@ -170,12 +170,24 @@ def diff_edition(wn, round, sbox, pbox, numRounds, tr, pbs, inputString):
 def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, totalCorr, inputString):
     #Set up of the window to be used for the input
     edit_window = tk.Toplevel(wn)
-    print(round)
     info = tk.Label(edit_window, text="Write new mask")
     info.grid(column = 0, row = 0)
     input = tk.Entry(edit_window)
     input.grid(row = 1, column=0)
 
+    def check(wn):
+        if (len(input.get()) != 4 or not(all(c in '01' for c in str(input.get())))):
+            #print("Input must be a 4 bit binary string")
+            popup = tk.Toplevel(wn)
+            popup.wm_title("ERROR")
+            label = tk.Label(popup, text="Input must be a 4 bit binary string")
+            label.pack(side="top", fill="x", pady=10)
+            B1 = tk.Button(popup, text="Okay", command = popup.destroy)
+            B1.pack()
+            popup.mainloop()
+
+        else:
+            change(wn)
     #function to change the linear data
     def change(wn):
         #convert to tuples to list to be able to modify
@@ -183,16 +195,25 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
 
         #get new input mask
         new_inp = input.get()
+        edit_window.destroy()
 
         #update mask
         sboxMasks[round][sboxnumber] = new_inp
 
         #update correlation
-        temptrail[round][2][sboxnumber] = lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)]
-
-        #calculate the total correlation
-        totroundcorr = sum(temptrail[round][2])
-        temptrail[round][0] = totroundcorr
+        if (lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)] == 0) :
+            temptrail[round][2][sboxnumber] = "inf"
+            temptrail[round][0] = "inf"
+            totalCorr = "inf"
+        else:
+            temptrail[round][2][sboxnumber] = math.log(abs(lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)]) , 2) 
+            #calculate the total correlation
+            totroundcorr = sum(temptrail[round][2])
+            temptrail[round][0] = totroundcorr
+            #update the total correlation
+            totalCorr = 0
+            for r in temptrail:
+                totalCorr = totalCorr + r[0]
         
 
         mask = [m for i in temptrail[round-1][1] for m in i]
@@ -214,16 +235,13 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
         #convert back to a list
         newtrail = [tuple(l) for l in temptrail]
 
-        #update the total correlation
-        totalCorr = 0
-        for r in temptrail:
-            totalCorr = totalCorr + r[0]
-
         #call visual method to display 
+        wn.destroy()
         visual(inputString, 2, numRounds, int(len(inputString)/4), sbox, pbox, "Linear", False, newtrail, sboxMasks, totalCorr)
+        
 
 
-    bt = tk.Button(edit_window, text = "Ok", command = lambda:change(wn))
+    bt = tk.Button(edit_window, text = "Ok", command = lambda:check(wn))
     bt.grid(row=2, column=0)
 
 
@@ -235,13 +253,11 @@ def calculate_diff(sBox, inputString, pBox, numOfRounds, wdw):
     if(len(trail)<numOfRounds):
         prev = numOfRounds
         numOfRounds = len(trail)
-        #diff.popup("Number of rounds",("You chose " + str(numOfRounds) + " but it is efficient to calculate up to " + str(len(trail)) + ", so this was used"))
+        #diff.popup("Number of rounds",("You chose " + str(numOfRounds) + " but/ it is efficient to calculate up to " + str(len(trail)) + ", so this was used"))
         popupmsg("Number of rounds",("You chose " + str(prev) + " but it is efficient to calculate up to " + str(len(trail)) + ", so this was used"), wdw )
     return trail, probs, prob_fin
 
 def calculate_lin(sBoxes, sBox, inputString, pBox, numOfRounds, wdw):
-    bt = tk.Button(wdw, text = "Linear Approximation table", command = lambda: showLAT(wdw, sBox))
-    bt.pack()
     trail = []
     sboxMasks = []
     #calculate the masks
@@ -278,9 +294,13 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
         prob_fin = p_fin
 
     if(type == "Linear" and first):
+        bt = tk.Button(wdw, text = "Linear Approximation table", command = lambda: showLAT(wdw, sBox))
+        bt.pack()
         trail, sboxMasks, totalCorr = calculate_lin(sBoxes, sBox, inputString, pBox, numOfRounds, wdw)
 
     if (type == "Linear" and not first):
+        bt = tk.Button(wdw, text = "Linear Approximation table", command = lambda: showLAT(wdw, sBox))
+        bt.pack()
         #assigment the variables for linear
         trail = tr
         sboxMasks = pbs
@@ -362,7 +382,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
 
                 #sboxes
                 #Creating the rectangle with the text
-                if(type == "Linear" or probs[r]>0):
+                if((type == "Linear" and trail[r][0] != "inf") or (type == "Differential" and probs[r]>0)):
                     arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155)
                 else:
                     arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155, outline="red")
@@ -447,9 +467,14 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
 
                 if(type == "Linear"):
                     #TODO stop text moving
-                    arrow1_canvas.create_text(width/2+110, end_arrow+50, text="correlation of round: " + str(round(trail[r][0],2)))
-                    pMask = ''.join(sboxMasks[r+1])
-                    arrow1_canvas.create_text(width/2-150, end_arrow+50, text="Permuted mask " + str(pMask))
+                    if (totalCorr == "inf"):
+                        arrow1_canvas.create_text(width/2+110, end_arrow+50, text="correlation of round: inf")
+                        pMask = ''.join(sboxMasks[r+1])
+                        arrow1_canvas.create_text(width/2-150, end_arrow+50, text="Permuted mask " + str(pMask))
+                    else:
+                        arrow1_canvas.create_text(width/2+110, end_arrow+50, text="correlation of round: " + str(round(trail[r][0],2)))
+                        pMask = ''.join(sboxMasks[r+1])
+                        arrow1_canvas.create_text(width/2-150, end_arrow+50, text="Permuted mask " + str(pMask))
 
                     for i in range(4):
                         button1 = tk.Button(master = arrow1_canvas,text = "Edit", anchor = tk.W, command = lambda r =r, i=i: lin_edition(wdw, r+1, i, sBox, pBox, numOfRounds, trail, sboxMasks, totalCorr, inputString))
@@ -481,16 +506,22 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                 if(type == "Linear"):
                     #TODO stop text moving
                     stop_prop = math.log(2.0**(-(16/2)), 2.0)
-                    if (totalCorr < stop_prop):
-                        arrow1_canvas.create_text(width/2, end_arrow+50, text="This is not an efficient attack, the correlation is too low")
+                    if (totalCorr == "inf"):
+                        arrow1_canvas.create_text(width/2, end_arrow+50, text="Total correlation: inf" )
+                        #output
+                        m = ''.join(sboxMasks[-1])
+                        arrow1_canvas.create_text(width/2, end_arrow+100, text="Output Mask: " + str(m))
                     else:
-                        arrow1_canvas.create_text(width/2, end_arrow+50, text="Total correlation: "+ str(round(totalCorr,2)))
-                    #output
-                    m = ''.join(sboxMasks[-1])
-                    arrow1_canvas.create_text(width/2, end_arrow+100, text="Output Mask: " + str(m))
-                    complexity = ((2**totalCorr) ** (-2.0))
-                    complexity = math.log(complexity, 2)
-                    arrow1_canvas.create_text(width/2, end_arrow+130, text="Complexity " + str(complexity))
+                        if (totalCorr < stop_prop):
+                            arrow1_canvas.create_text(width/2, end_arrow+50, text= "Total correlation: " + str(round(totalCorr,2)) + " This is not an efficient attack, the correlation is lower than " + str(stop_prop))
+                        else:
+                            arrow1_canvas.create_text(width/2, end_arrow+50, text="Total correlation: " + str(round(totalCorr,2)))
+                        #output
+                        m = ''.join(sboxMasks[-1])
+                        arrow1_canvas.create_text(width/2, end_arrow+100, text="Output Mask: " + str(m))
+                        complexity = ((2**totalCorr) ** (-2.0))
+                        complexity = math.log(complexity, 2)
+                        arrow1_canvas.create_text(width/2, end_arrow+130, text="Complexity " + str(complexity))
 
                 end_y = (r+1)*end_arrow+200
 
