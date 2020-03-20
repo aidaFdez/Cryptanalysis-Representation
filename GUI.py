@@ -5,34 +5,14 @@ import sys
 import re
 
 
-if __name__ == '__main__':
-    #Pass the differential values automatically, no need to input them everytime.
-    if len(sys.argv)>1:
-        pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
-        if sys.argv[1] == "diff":
-            sBox = [6,4,12,5,0,7,2,14,1,15,3,13,8,10,9,11]
-            pBox =[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11, 15]
-            #sBox = [1,2,3,0, 5, 6, 7, 4]
-            #pBox = [2,3,0,1, 5, 6, 7, 4, 9, 10, 11, 8]
-            #000f
-            visual.visual("000f", 2, 7,len("000f") , sBox, pBox, "Differential", True, [],[],1)
-            exit()
-    #Pass the linear values automatically, no need to input them everytime.
-        if sys.argv[1] == "lin":
-            sBox = [15,14,11,12,6,13,7,8,0,3,9,10,4,2,1,5]
-            pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
-            visual.visual("0000110011110011", 2, 6 , 4, sBox, pBox, "Linear", True, [],[],1)
-            exit()
-
-
 window =Tk()
 window.title("Cryptanalysis")
 
 #GUI for choosing the kind of cryptanalysis
-messKind = Label(window, text="Choose the kind of cryptanalysis")
+messKind = Label(window, text="Choose type of attack")
 messKind.grid(column = 0, row  = 0)
 type = StringVar()
-linear = Radiobutton(window, text ="Linear", value = "Linear", variable = type)
+linear = Radiobutton(window, text ="Linear        ", value = "Linear", variable = type)
 differential = Radiobutton(window, text ="Differential", value = "Differential", variable = type)
 differential.grid(column = 0, row = 1)
 linear.grid(column = 0, row = 2)
@@ -116,6 +96,16 @@ def popupmsg(msg):
     B1.pack()
     popup.mainloop()
 
+def creatediff():
+    sBox = [6,4,12,5,0,7,2,14,1,15,3,13,8,10,9,11]
+    pBox =[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11, 15]
+    visual.visual("000f", 2, 7,len("000f") , sBox, pBox, "Differential", True, [],[],1)
+    #exit()
+def createlin():
+    sBox = [15,14,11,12,6,13,7,8,0,3,9,10,4,2,1,5]
+    pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
+    visual.visual("0000110011110011", 2, 6 , 4, sBox, pBox, "Linear", True, [],[],1)
+    #exit()
 
 def create():
     #Get the input string
@@ -184,5 +174,11 @@ def create():
 
 generateButton = Button(window, text = "Generate", command = create)
 generateButton.grid(row = 16, column = 0)
+
+generateDifferential = Button(window, text = "Default Differential Trail", command = creatediff)
+generateDifferential.grid(row = 17, column = 0)
+
+generateLinear = Button(window, text = "Default Linear Trail", command = createlin)
+generateLinear.grid(row = 18, column = 0)
 
 window.mainloop()
