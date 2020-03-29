@@ -200,22 +200,6 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
         #update mask
         sboxMasks[round][sboxnumber] = new_inp
 
-        #update correlation
-        if (lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)] == 0) :
-            temptrail[round][2][sboxnumber] = "inf"
-            temptrail[round][0] = "inf"
-            totalCorr = "inf"
-        else:
-            temptrail[round][2][sboxnumber] = math.log(abs(lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)]) , 2) 
-            #calculate the total correlation
-            totroundcorr = sum(temptrail[round][2])
-            temptrail[round][0] = totroundcorr
-            #update the total correlation
-            totalCorr = 0
-            for r in temptrail:
-                totalCorr = totalCorr + r[0]
-        
-
         mask = [m for i in temptrail[round-1][1] for m in i]
         # recalulate previous round
         for i in range(sboxnumber*4, (4*sboxnumber)+4):
@@ -231,6 +215,21 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
         #calculate total correlation of previous round
         totprevroundcorr = sum(temptrail[round-1][2])
         temptrail[round-1][0] = totprevroundcorr
+
+        #update correlation
+        if (lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)] == 0) :
+            temptrail[round][2][sboxnumber] = "inf"
+            temptrail[round][0] = "inf"
+            totalCorr = "inf"
+        else:
+            temptrail[round][2][sboxnumber] = math.log(abs(lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)]) , 2) 
+            #calculate the total correlation
+            totroundcorr = sum(temptrail[round][2])
+            temptrail[round][0] = totroundcorr
+            #update the total correlation
+            totalCorr = 0
+            for r in temptrail:
+                totalCorr = totalCorr + r[0]
 
         #convert back to a list
         newtrail = [tuple(l) for l in temptrail]
@@ -393,7 +392,11 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+150, text=trail[r][1][a])
 
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+110, text="Corr:")
-                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+130, text=round(trail[r][2][a],2))
+                    if (trail[r][2][a] == "inf"):
+                        rc = "inf"
+                    else:
+                        rc = round(trail[r][2][a],2)
+                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)+50, end_arrow+130, text= rc)
                 #Print the before and after the substitution happens
                 if(type == "Differential"):
                     w = ""
@@ -472,7 +475,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                         pMask = ''.join(sboxMasks[r+1])
                         arrow1_canvas.create_text(width/2-150, end_arrow+50, text="Permuted mask " + str(pMask))
                     else:
-                        arrow1_canvas.create_text(width/2+110, end_arrow+50, text="correlation of round: " + str(round(trail[r][0],2)))
+                        arrow1_canvas.create_text(width/2+110, end_arrow+50, text="correlation of round: " + str(round(trail[r+1][0],2)))
                         pMask = ''.join(sboxMasks[r+1])
                         arrow1_canvas.create_text(width/2-150, end_arrow+50, text="Permuted mask " + str(pMask))
 
