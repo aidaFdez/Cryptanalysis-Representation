@@ -10,7 +10,8 @@ trail = []
 lintrail = []
 probs = []
 
-#Difference distribution table hardcoded
+
+#Difference distribution table hardcoded for testing
 ddft = [[16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,6,0,0,0,0,2,0,2,0,0,2,0,4,0],
         [0,6,6,0,0,0,0,0,0,2,2,0,0,0,0,0],
@@ -28,7 +29,7 @@ ddft = [[16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,2,0,4,2,0,0,0,0,0,2,0,0,0,0,6],
         [0,0,0,0,2,0,2,0,0,0,0,0,0,10,0,2]]
 
-#Linear approximation table hardcoded
+#Linear approximation table hardcoded for testing
 lat = [[16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,6,0,10,0,6,12,6,10,12,10,0,6,0,10,0],
         [0,10,6,0,6,0,0,10,10,12,0,10,12,6,6,0],
@@ -298,6 +299,11 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
 
     end_y = 0
 
+    #Set so the scrolling fits the window
+    def update_scrollregion(event, sBoxes, numOfRounds, wdw, canvas):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+        configure(event,sBoxes, numOfRounds)
+
     def configure(event, num_arrows, num_rounds):
         end_arrow= 150
         arrow1_canvas.delete("all")
@@ -515,7 +521,8 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
 
     arrow1_canvas = tk.Canvas(wdw, yscrollcommand = scrollbar.set, scrollregion=(0,0,(numOfRounds+1)*300, (numOfRounds+1)*300))
     arrow1_canvas.pack(fill=tk.BOTH, expand = 1)
+    arrow1_canvas.configure(scrollregion=arrow1_canvas.bbox("all"))
 
-    arrow1_canvas.bind("<Configure>", lambda event, num_arrows = sBoxes, num_rounds=numOfRounds: configure(event,sBoxes, numOfRounds))
+    arrow1_canvas.bind("<Configure>", lambda event, num_arrows = sBoxes, num_rounds=numOfRounds: update_scrollregion(event,sBoxes, numOfRounds, wdw, arrow1_canvas))
     scrollbar.config(command=arrow1_canvas.yview)
     wdw.mainloop()

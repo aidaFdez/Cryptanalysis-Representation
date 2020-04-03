@@ -9,11 +9,8 @@ root =Tk()
 root.title("Cryptanalysis")
 root.geometry("1000x370")
 
-#Canvas should be window, frame is the other intermediate
 def update_scrollregion(event):
     wdw.configure(scrollregion=window.bbox("all"))
-
-
 
 photoFrame = Frame(root, width=1550, height=400)
 photoFrame.grid()
