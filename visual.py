@@ -65,8 +65,8 @@ def showDdft(wn, sbox):
             else:
                 prob = tk.Label(fr,text =ddft2[i][j], relief=tk.RIDGE, width=10, bg = 'LightSkyBlue1')
             prob.grid(row = i+1, column = j+1)
-            if not(ddft [i][j] == ddft2[i][j]):
-                print("The one in ", i, ", ", j, " is different")
+            #if not(ddft [i][j] == ddft2[i][j]):
+            #    print("The one in ", i, ", ", j, " is different")
 
 def showLAT(wn, sbox):
     #Creatw window to display LAT
@@ -110,17 +110,9 @@ def diff_edition(wn, round, sbox, pbox, numRounds, tr, pbs, inputString):
         new_diff = input.get()
         old_trail = tr
         old_probs = pbs
-        #old_prob_fin = diff.diffTrail(sbox, inputString, diff.diffDistTable(sbox), pbox, numRounds)
-        #print(new_diff)
         new_round = diff.getInts(new_diff)
-        #print((old_trail), " This is the old trail")
         old_round = old_trail[round-1]
         next_round = old_trail[round+1]
-        #print(old_round, " This is the old round")
-        #print(old_trail[round-1], " This is the previous of the old round")
-        #Get the data from the new input
-        #new_trail, new_probs, new_fin_prob = diff.diffTrail(sbox, new_diff, diff.diffDistTable(sbox), pbox, numRounds)
-        #print(new_trail, " This is the new trail")
         new_prob = 1
         ddt = diff.diffDistTable(sbox)
         #Calculate the probability with the edited round
@@ -148,15 +140,8 @@ def diff_edition(wn, round, sbox, pbox, numRounds, tr, pbs, inputString):
 
         final_trail = old_trail
         final_trail[round] = new_round
-        #final_trail.extend(old_trail[:round])
-        #final_trail.append(new_round)
-        #final_trail.extend(new_trail)
         final_probs = old_probs
         final_probs[round] = new_prob
-        #final_probs.extend(old_probs[:round])
-        #final_probs.append(new_prob)
-        #final_probs.extend(new_probs)
-        #print(final_probs)
         print(final_trail[round])
         fin_prob = 1
         for pr in final_probs:
@@ -211,7 +196,7 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
         #recalculate correlations for previous round
         for i in range(4):
             temptrail[round-1][2][i] = lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)]
-        
+
         #calculate total correlation of previous round
         totprevroundcorr = sum(temptrail[round-1][2])
         temptrail[round-1][0] = totprevroundcorr
@@ -222,7 +207,7 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
             temptrail[round][0] = "inf"
             totalCorr = "inf"
         else:
-            temptrail[round][2][sboxnumber] = math.log(abs(lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)]) , 2) 
+            temptrail[round][2][sboxnumber] = math.log(abs(lin.linApptable(sbox)[int(new_inp,2)][int(temptrail[round][1][sboxnumber],2)]) , 2)
             #calculate the total correlation
             totroundcorr = sum(temptrail[round][2])
             temptrail[round][0] = totroundcorr
@@ -234,10 +219,10 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
         #convert back to a list
         newtrail = [tuple(l) for l in temptrail]
 
-        #call visual method to display 
+        #call visual method to display
         wn.destroy()
         visual(inputString, 2, numRounds, int(len(inputString)/4), sbox, pbox, "Linear", False, newtrail, sboxMasks, totalCorr)
-        
+
 
 
     bt = tk.Button(edit_window, text = "Ok", command = lambda:check(wn))

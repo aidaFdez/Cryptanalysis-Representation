@@ -78,7 +78,7 @@ def diffTrail(sbox, data, ddt, pbox, rounds):
                 general_prob = general_prob*prob
                 trail.append(swapped)
         r = r+1
-    print("Useful until round ", len(trail), " with probability ", general_prob)
+    #print("Useful until round ", len(trail), " with probability ", general_prob)
     return trail, probabilities, general_prob
 
 #Do the swaps according to the pBox
@@ -91,6 +91,7 @@ def pBoxSwaps(pBox, input):
     bin_output =  [0]*len(pBox)
     #Do the swaps
     for n in range(int(len(pBox))):
+        #print(len(pBox))
         bin_output[pBox[n]] = output[n]
     new_diff = []
     #That division should be the number of bits of the thingy
@@ -228,9 +229,9 @@ def popup(title, msg):
     button = tk.Button(popup, text="Click Me", command=lambda: var.set(1))
     button.pack()
 
-    print("waiting...")
+    #print("waiting...")
     button.wait_variable(var)
-    print("done waiting.")
+    #print("done waiting.")
 #("You chose " + str(numOfRounds) + " but it is efficient to calculate up to " + str(len(trail)) + ", so this was used")
 
 #TODO boton de cambiar, cambios simples,

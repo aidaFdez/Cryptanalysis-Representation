@@ -5,14 +5,39 @@ import sys
 import re
 
 
-window =Tk()
-window.title("Cryptanalysis")
+root =Tk()
+root.title("Cryptanalysis")
+root.geometry("1000x370")
+
+#Canvas should be window, frame is the other intermediate
+def update_scrollregion(event):
+    wdw.configure(scrollregion=window.bbox("all"))
+
+
+
+photoFrame = Frame(root, width=1550, height=400)
+photoFrame.grid()
+photoFrame.rowconfigure(0, weight=1)
+photoFrame.columnconfigure(0, weight=1)
+
+wdw = Canvas(photoFrame, height=340, width = 1000 )
+wdw.grid(row=0, column=0, sticky="nsew")
+
+window = Frame(wdw,width=1550, height=400 )
+wdw.create_window(0, 0, window=window, anchor='nw')
+
+photoScroll = Scrollbar(photoFrame, orient=HORIZONTAL)
+photoScroll.config(command=wdw.xview)
+wdw.config(xscrollcommand=photoScroll.set)
+photoScroll.grid(row=1, column=0, sticky="we")
+
+window.bind("<Configure>", update_scrollregion)
 
 #GUI for choosing the kind of cryptanalysis
 messKind = Label(window, text="Choose type of attack")
 messKind.grid(column = 0, row  = 0)
 type = StringVar()
-linear = Radiobutton(window, text ="Linear        ", value = "Linear", variable = type)
+linear = Radiobutton(window, text ="Linear       ", value = "Linear", variable = type)
 differential = Radiobutton(window, text ="Differential", value = "Differential", variable = type)
 differential.grid(column = 0, row = 1)
 linear.grid(column = 0, row = 2)
@@ -34,8 +59,8 @@ sbox = []
 entries = []
 entry_titles = []
 for i in range(1,17):
-    Label(text = i-1, relief=RIDGE, width=10).grid(row = 11, column=i)
-    ent = Entry(width = 10)
+    Label(window, text = i-1, relief=RIDGE, width=10).grid(row = 11, column=i)
+    ent = Entry(window, width = 10)
     ent.grid(row = 12, column=i)
     entries.append(ent)
 
@@ -43,34 +68,35 @@ for i in range(1,17):
 pBox = []
 pentry_titles = []
 
-def createPbox(self):
-    j = 0
-    #delete all of previous ones
-    for et in pentry_titles[:]:
-        et.grid_forget()
-        pentry_titles.remove(et)
-    for en in pBox[:]:
-        en.grid_forget()
-        pBox.remove(en)
+#def createPbox(self):
+j =0
+#delete all of previous ones
+for et in pentry_titles[:]:
+    et.grid_forget()
+    pentry_titles.remove(et)
+for en in pBox[:]:
+    en.grid_forget()
+    pBox.remove(en)
 
-    while j<4*boxes.get():
-        et = Label(text = j, relief=RIDGE, width=10)
-        et.grid(row = 14, column=j+1)
-        pentry_titles.append(et)
-        ent = Entry(width = 10)
-        ent.grid(row = 15, column=j+1)
-        pBox.append(ent)
-        j +=1
+while j<16: #4*boxes.get() for any number
+    et = Label(window, text = j, relief=RIDGE, width=10)
+    et.grid(row = 14, column=j+1)
+    pentry_titles.append(et)
+    ent = Entry(window, width = 10)
+    ent.grid(row = 15, column=j+1)
+    pBox.append(ent)
+    j +=1
 
-Label(text = "x", relief=RIDGE, width=10).grid(row = 14, column=0)
+Label(window,text = "x", relief=RIDGE, width=10).grid(row = 14, column=0)
 
-Label(text = "P[x]", relief=RIDGE, width=10).grid(row = 15, column=0)
+Label(window, text = "P[x]", relief=RIDGE, width=10).grid(row = 15, column=0)
 
 boxes = IntVar(window)
 box_choices = (0,2,3,4,5)
-boxpopupMenu = OptionMenu(window, boxes, *box_choices, command = createPbox)
-Label(window, text="Choose the length of permutation box").grid(row = 9, column=0)
-boxpopupMenu.grid(row = 10, column = 0)
+ #SAVE THIS FOR ANY NUMBER BOXES
+#boxpopupMenu = OptionMenu(window, boxes, *box_choices, command = createPbox)
+#Label(window, text="Choose the length of permutation box").grid(row = 9, column=0)
+#boxpopupMenu.grid(row = 10, column = 0)
 
 #create S-box tables
 height = 2
@@ -78,9 +104,9 @@ width = 8
 cells = {}
 table = Frame(window)
 
-Label(text = "x", relief=RIDGE, width=10).grid(row = 11, column=0)
+Label(window,text = "x", relief=RIDGE, width=10).grid(row = 11, column=0)
 
-Label(text = "S[x]", relief=RIDGE, width=10).grid(row = 12, column=0)
+Label(window,text = "S[x]", relief=RIDGE, width=10).grid(row = 12, column=0)
 
 
 def printSbox():
@@ -128,25 +154,26 @@ def create():
     if (type.get() == "Linear" and (len(inputString) != 16 or not(all(c in '01' for c in str(inputString))))):
         popupmsg("A 16 bit binary string is required for Linear Cryptanalysis")
         return
-
-    if (int(boxes.get()) == 0):
-        popupmsg("Please select the number of P-boxes")
-        return
-    if (type.get() == "Differential" and not(len(inputString) == int(boxes.get()))):
-        popupmsg("The number of P-boxes has to be 4 times the length of the input")
-        return
-    if (type.get() == "Linear" and not(len(inputString) == 16)):
-        popupmsg("The number of P-boxes has to be the same size as the S-box")
-        return
+    #NOT DELETE needed for any number boxes
+    #if (int(boxes.get()) == 0):
+    #    popupmsg("Please select the number of P-boxes")
+    #    return
+    #if (type.get() == "Differential" and not(len(inputString) == int(boxes.get()))):
+    #    popupmsg("The number of P-boxes has to be 4 times the length of the input")
+    #    return
+    #if (type.get() == "Linear" and not(len(inputString) == 16)):
+    #    popupmsg("The number of P-boxes has to be the same size as the S-box")
+    #    return
     #Get the pBox
     send = []
     for en in pBox:
         #checks to correct values
         if(en.get() == ""):
             popupmsg("Empty P-box value")
-        if (int(en.get()) < 0 or int(en.get()) > 4*int(boxes.get())):
-            popupmsg("pbox values out of range")
-            return
+        #NOT DELETE
+        #if (int(en.get()) < 0 or int(en.get()) > 4*int(boxes.get())):
+        #    popupmsg("pbox values out of range")
+        #    return
         if (int(en.get()) in send):
             popupmsg("Repeated pbox values")
             return
@@ -181,4 +208,4 @@ generateDifferential.grid(row = 17, column = 0)
 generateLinear = Button(window, text = "Default Linear Trail", command = createlin)
 generateLinear.grid(row = 18, column = 0)
 
-window.mainloop()
+root.mainloop()
