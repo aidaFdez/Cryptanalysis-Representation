@@ -65,35 +65,35 @@ for i in range(1,17):
 pBox = []
 pentry_titles = []
 
-#def createPbox(self):
-j =0
-#delete all of previous ones
-for et in pentry_titles[:]:
-    et.grid_forget()
-    pentry_titles.remove(et)
-for en in pBox[:]:
-    en.grid_forget()
-    pBox.remove(en)
+def createPbox(self):
+    j =0
+    #delete all of previous ones
+    for et in pentry_titles[:]:
+        et.grid_forget()
+        pentry_titles.remove(et)
+    for en in pBox[:]:
+        en.grid_forget()
+        pBox.remove(en)
 
-while j<16: #4*boxes.get() for any number
-    et = Label(window, text = j, relief=RIDGE, width=10)
-    et.grid(row = 14, column=j+1)
-    pentry_titles.append(et)
-    ent = Entry(window, width = 10)
-    ent.grid(row = 15, column=j+1)
-    pBox.append(ent)
-    j +=1
+    while j<4*boxes.get(): # for any number
+        et = Label(window, text = j, relief=RIDGE, width=10)
+        et.grid(row = 14, column=j+1)
+        pentry_titles.append(et)
+        ent = Entry(window, width = 10)
+        ent.grid(row = 15, column=j+1)
+        pBox.append(ent)
+        j +=1
 
 Label(window,text = "x", relief=RIDGE, width=10).grid(row = 14, column=0)
 
 Label(window, text = "P[x]", relief=RIDGE, width=10).grid(row = 15, column=0)
 
 boxes = IntVar(window)
-box_choices = (0,2,3,4,5)
+box_choices = (0,1,2,3,4,5)
  #SAVE THIS FOR ANY NUMBER BOXES
-#boxpopupMenu = OptionMenu(window, boxes, *box_choices, command = createPbox)
-#Label(window, text="Choose the length of permutation box").grid(row = 9, column=0)
-#boxpopupMenu.grid(row = 10, column = 0)
+boxpopupMenu = OptionMenu(window, boxes, *box_choices, command = createPbox)
+Label(window, text="Choose the length of permutation box").grid(row = 9, column=0)
+boxpopupMenu.grid(row = 10, column = 0)
 
 #create S-box tables
 height = 2
@@ -122,12 +122,13 @@ def popupmsg(msg):
 def creatediff():
     sBox = [6,4,12,5,0,7,2,14,1,15,3,13,8,10,9,11]
     pBox =[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11, 15]
-    visual.visual("000f", 2, 7,len("000f") , sBox, pBox, "Differential", True, [],[],1)
+    #pBox = [0,1,2,3,4,5,6,7,8,9,10,11]
+    visual.visual("000f", 2, 5,len("000f") , sBox, pBox, "Differential", True, [],[],1, [])
     #exit()
 def createlin():
     sBox = [15,14,11,12,6,13,7,8,0,3,9,10,4,2,1,5]
     pBox =[11,12,15,6,0,9,5,3,4,14,8,7,10,1,2,13]
-    visual.visual("0000110011110011", 2, 6 , 4, sBox, pBox, "Linear", True, [],[],1)
+    visual.visual("0000110011110011", 2, 6 , 4, sBox, pBox, "Linear", True, [],[],1, [])
     #exit()
 
 def create():
@@ -145,22 +146,22 @@ def create():
         return
     pattern = re.compile("([abcdefABCDEF][0-9])*")
     if (type.get() == "Differential" and not(pattern.match(inputString))):
-        popupmsg("A hexadecimal string is required for Differential Cryptanalysis")
+        popupmsg("A hexadecimal string is required for Differential Cryptanalysis, of the type \"0a3d\"")
         return
 
     if (type.get() == "Linear" and (len(inputString) != 16 or not(all(c in '01' for c in str(inputString))))):
         popupmsg("A 16 bit binary string is required for Linear Cryptanalysis")
         return
     #NOT DELETE needed for any number boxes
-    #if (int(boxes.get()) == 0):
-    #    popupmsg("Please select the number of P-boxes")
-    #    return
-    #if (type.get() == "Differential" and not(len(inputString) == int(boxes.get()))):
-    #    popupmsg("The number of P-boxes has to be 4 times the length of the input")
-    #    return
-    #if (type.get() == "Linear" and not(len(inputString) == 16)):
-    #    popupmsg("The number of P-boxes has to be the same size as the S-box")
-    #    return
+    if (int(boxes.get()) == 0):
+       popupmsg("Please select the number of P-boxes")
+       return
+    if (type.get() == "Differential" and not(len(inputString) == int(boxes.get()))):
+       popupmsg("The number of P-boxes has to be 4 times the length of the input")
+       return
+    if (type.get() == "Linear" and not(len(inputString) == 16)):
+       popupmsg("The number of P-boxes has to be the same size as the S-box for a linear cryptanalysis")
+       return
     #Get the pBox
     send = []
     for en in pBox:
@@ -168,9 +169,9 @@ def create():
         if(en.get() == ""):
             popupmsg("Empty P-box value")
         #NOT DELETE
-        #if (int(en.get()) < 0 or int(en.get()) > 4*int(boxes.get())):
-        #    popupmsg("pbox values out of range")
-        #    return
+        if (int(en.get()) < 0 or int(en.get()) > 4*int(boxes.get())):
+           popupmsg("pbox values out of range, these must be from 0 to " + str(4*int(boxes.get())))
+           return
         if (int(en.get()) in send):
             popupmsg("Repeated pbox values")
             return
@@ -192,9 +193,9 @@ def create():
         sbox.append(int(en.get()))
 
     if(type.get() == "Linear") :
-        visual.visual(inputString, 2, rounds.get(), int(len(inputString)/4), sbox, send, type.get(), True, [],[],1)
+        visual.visual(inputString, 2, rounds.get(), int(len(inputString)/4), sbox, send, type.get(), True, [],[],1, [])
     if(type.get() == "Differential") :
-        visual.visual(inputString, 2, rounds.get(), len(inputString), sbox, send, type.get(), True, [],[],1)
+        visual.visual(inputString, 2, rounds.get(), len(inputString), sbox, send, type.get(), True, [],[],1, [])
 
 generateButton = Button(window, text = "Generate", command = create)
 generateButton.grid(row = 16, column = 0)

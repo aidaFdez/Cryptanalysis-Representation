@@ -1,4 +1,6 @@
 import tkinter as tk
+import re
+
 import diff
 import lin
 import math
@@ -53,13 +55,13 @@ def showDdft(wn, sbox):
     fr = tk.Frame(ddftWnw)
     fr.pack()
     ddft2 = diff.diffDistTable(sbox)
-    for i in range(16):
+    for i in range(len(sbox)):
         #TODO change colour depending on the row for easiness to read
         row = tk.Label(fr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
         row.grid(row = 0, column = i+1)
         col = tk.Label(fr,text = i, relief=tk.RIDGE, width=10, bg = 'gray')
         col.grid(row = i+1, column = 0)
-        for j in range(16):
+        for j in range(len(sbox)):
             prob = tk.Label(fr,text =ddft2[i][j], relief=tk.RIDGE, width=10)
             if (i % 2 == 0):
                 prob = tk.Label(fr,text =ddft2[i][j], relief=tk.RIDGE, width=10)
@@ -97,57 +99,99 @@ def popupmsg(title, msg, wn):
     fr.pack()
     label.pack(side="top", fill="x", pady=10)
 
-def diff_edition(wn, round, sbox, pbox, numRounds, tr, pbs, inputString):
+def diff_edition(wn, round, sbox, pbox, numRounds, tr, pbs, inputString, svalues):
     #Set up of the window to be used for the input
     edit_window = tk.Toplevel(wn)
-    print(round)
+    #print(round)
     info = tk.Label(edit_window, text="Write new difference")
     info.grid(column = 0, row = 0)
     input = tk.Entry(edit_window)
     input.grid(row = 1, column=0)
 
+    #print(inputString ," is the inpStr")
+    #print(round, " is the number of the round")
+
     #function to be called by the button to change all the data
     def change(wn):
         new_diff = input.get()
-        old_trail = tr
-        old_probs = pbs
-        new_round = diff.getInts(new_diff)
-        old_round = old_trail[round-1]
-        next_round = old_trail[round+1]
-        new_prob = 1
-        ddt = diff.diffDistTable(sbox)
-        #Calculate the probability with the edited round
-        """for i in old_round:
-            for j in new_round:"""
-        for i in range(4):
-            #Check it works with the previous round
-            old = old_round[i]
-            new = new_round[i]
-            pr = ddt[old][new]
-            print("Probability of ", old, " to ", new, " is ", pr)
-            if(pr == 0):
-                print("Probability of ", old, " to ", new, " is 0")
-                popupmsg("Zero probability",("Probability of ", old, " to ", new, " is 0"),wn )
-            #Check it works with the next round
-            old_n = next_round[i]
-            new_n = new_round[i]
-            pr_n = ddt[new_n][old_n]
-            print("Probability of ", new_n, " to ", old_n, " is ", pr_n)
-            if(pr_n == 0):
-                print("Probability of ", old, " to ", new, " is 0")
-                popupmsg("Zero probability", ("Probability of ", new_n, " to ", old_n, " is ", pr_n),wn)
+        pattern = re.compile("([abcdefABCDEF][0-9])*")
+        if not (len(new_diff) == int(len(pbox)/4)) or not(pattern.match(new_diff)):
+            popup = tk.Tk()
+            popup.wm_title("ERROR")
+            label = tk.Label(popup, text=str("The new difference needs to be of length "+ str(int(len(pbox)/4))+ " and of the type \"0a3d\"") )
+            label.pack(side="top", fill="x", pady=10)
+            b1 = tk.Button(popup, text="Okay", command=popup.destroy)
+            b1.pack()
+            popup.mainloop()
+        else:
+            old_trail = tr
+            old_probs = pbs
+            new_round = diff.getInts(new_diff)
+            old_round = old_trail[round-1]
+            next_round = old_trail[round+1]
+            new_prob = 1
+            ddt = diff.diffDistTable(sbox)
 
-            new_prob = new_prob* (pr/16)
+            # binary representation of the  new round, to undo it
+            new_bin = []
+            for c in new_round:
+                #print(c)
+                new_bin.extend(diff.getBinary(c))
+            # binary result of undoing the pbox
+            undone_binary = [0]*len(pbox)
+            #print(undone_binary)
+            #print(new_bin)
+            for i in range(len(pbox)):
+                #print(pbox.index(i))
+                #print(new_bin[i])
+                undone_binary[pbox.index(i)] = new_bin[i]
+            # get the int values of the undone
+            new_svalue = []
+            for i in range(int(len(pbox)/4)):
+                interm = [undone_binary[i * 4], undone_binary[i * 4 + 1], undone_binary[i * 4 + 2],
+                          undone_binary[i * 4 + 3]]
+                new_svalue.extend(diff.fromBinary(interm))
+            error = ""
 
-        final_trail = old_trail
-        final_trail[round] = new_round
-        final_probs = old_probs
-        final_probs[round] = new_prob
-        print(final_trail[round])
-        fin_prob = 1
-        for pr in final_probs:
-            fin_prob = fin_prob*prvisual
-        visual(inputString, 2, numRounds, len(inputString), sbox, pbox, "Differential", False, final_trail, final_probs, fin_prob)
+            # now that we have the new svalues, check that they can match the dfft
+            #print(new_svalue)
+            #print(old_round)
+            #print(old_trail)
+            inp_data = diff.getInts(inputString)
+            for i in range(len(new_svalue)):
+                # for each of the rows in the ddft, calculate new probability
+                np = ddt[old_round[i]][new_svalue[i]]/16
+                if round == 0:
+                    np= ddt[inp_data[i]][new_svalue[i]]/16
+                new_prob = new_prob * np
+
+                # if the new probability is 0, then add it to the error string
+                #print(ddt[old_round[i]][new_svalue[i]])
+                if(np<=0):
+                    error = error + str("Not possible to go from "+ str(new_svalue[i]) + " to " + str(old_round[i]) + "\n")
+            #print(error)
+            final_trail = old_trail
+            final_trail[round] = new_round
+
+            svalues[round] = new_svalue
+
+            final_probs = old_probs
+            final_probs[round] = new_prob
+
+            # Need to check that the new round values fit with the ones from that round's substitution
+            #print(svalues[round+1])
+            second_prob = 1
+            for i in range(len(new_svalue)):
+                #print("from ",next_round[i]," to ",new_svalue[i] )
+                np = ddt[next_round[i]][new_svalue[i]]/len(sbox)
+                second_prob = second_prob * np
+                #print(np)
+            final_probs[round+1] = second_prob
+
+            fin_prob = 1
+            for p in final_probs:
+                fin_prob = fin_prob*p
+            visual(inputString, 2, numRounds, len(inputString), sbox, pbox, "Differential", False, final_trail, final_probs, fin_prob, svalues)
 
 
     bt = tk.Button(edit_window, text = "Ok", command = lambda:change(wn))
@@ -222,7 +266,7 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
 
         #call visual method to display
         wn.destroy()
-        visual(inputString, 2, numRounds, int(len(inputString)/4), sbox, pbox, "Linear", False, newtrail, sboxMasks, totalCorr)
+        visual(inputString, 2, numRounds, int(len(inputString)/4), sbox, pbox, "Linear", False, newtrail, sboxMasks, totalCorr, [])
 
 
 
@@ -233,14 +277,14 @@ def lin_edition(wn, round, sboxnumber, sbox, pbox, numRounds, trail, sboxMasks, 
 def calculate_diff(sBox, inputString, pBox, numOfRounds, wdw):
     bt = tk.Button(wdw, text = "Difference distribution table", command = lambda: showDdft(wdw, sBox))
     bt.pack()
-    trail, probs, prob_fin = diff.diffTrail(sBox, inputString, diff.diffDistTable(sBox), pBox, numOfRounds)
+    trail, probs, prob_fin, svalues = diff.diffTrail(sBox, inputString, diff.diffDistTable(sBox), pBox, numOfRounds)
     #If the number of rounds is more than the one of the trail, then more rounds were chosen than it is worth calculating
     if(len(trail)<numOfRounds):
         prev = numOfRounds
         numOfRounds = len(trail)
         #diff.popup("Number of rounds",("You chose " + str(numOfRounds) + " but/ it is efficient to calculate up to " + str(len(trail)) + ", so this was used"))
         popupmsg("Number of rounds",("You chose " + str(prev) + " but it is efficient to calculate up to " + str(len(trail)) + ", so this was used"), wdw )
-    return trail, probs, prob_fin
+    return trail, probs, prob_fin, svalues
 
 def calculate_lin(sBoxes, sBox, inputString, pBox, numOfRounds, wdw):
     trail = []
@@ -266,13 +310,14 @@ def calculate_lin(sBoxes, sBox, inputString, pBox, numOfRounds, wdw):
 
     return trail, sboxMasks, totalCorr
 
-def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first, tr, pbs, p_fin):
+def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first, tr, pbs, p_fin, svalues):
 
     wdw =tk.Tk()
-
+    wdw.geometry("500x600")
+    #svalues = []
     if(type == "Differential" and first):
-        trail, probs, prob_fin = calculate_diff(sBox, inputString, pBox, numOfRounds, wdw)
-        print(trail)
+        trail, probs, prob_fin, svalues = calculate_diff(sBox, inputString, pBox, numOfRounds, wdw)
+        #print(trail)
     if(type == "Differential" and not first):
         trail = tr
         probs = pbs
@@ -345,8 +390,11 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
             if(type == "Differential"):
                 bin = []
                 #For each value in the trail of this round
+                #print("Printing values")
                 for val in trail[r]:
+                    #print(val)
                     bin.extend(diff.getBinary(val))
+                #print(bin)
             for a in range(num_arrows):
                 #arrows to sboxes
                 #round 1
@@ -375,7 +423,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                 if((type == "Linear" and trail[r][0] != "inf") or (type == "Differential" and probs[r]>0)):
                     arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155)
                 else:
-                    arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155, outline="red")
+                    arrow1_canvas.create_rectangle(width/(num_arrows+1)*(a+1)-25, end_arrow+105, width/(num_arrows+1)*(a+1)+25, end_arrow+155, outline="red", fill = "#ff8080")
                 if(type == "Linear"):
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), end_arrow+130, text="S")
                     arrow1_canvas.create_text(width/(num_arrows+1)*(a+1)-50, end_arrow+110, text=sboxMasks[r][a])
@@ -395,7 +443,8 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                         w = inputString[a]
                     else:
                         w = trail[r-1][a]
-                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), end_arrow+130, text=( str(w) + "\nS\n" + str(diff.fromBinary([bin[a%4],bin[a%4+4], bin[a%4+8], bin[a%4+12]])[0])))
+                    sus, discard = diff.doSbox(w, 1, ddft)
+                    arrow1_canvas.create_text(width/(num_arrows+1)*(a+1), end_arrow+130, text=(str(w) + "\nS\n" + str(svalues[r][a])))
 
                 #First arrow
                 if((type == "Differential" and bin[pBox[4*a]] == 0) or (type == "Linear" and (trail[r][1][a])[0] == '0')):
@@ -450,12 +499,12 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                     else:
                         arrow1_canvas.create_text(19*width/20, end_arrow+50, text="Not possible")
 
-                    arrow1_canvas.create_text(width/3, end_arrow+50, text="Button")
+                    # arrow1_canvas.create_text(width/3, end_arrow+50, text="Button")
                     #edit = tk.Button(arrow1_canvas)
                     #edit.place(x=19*width/20, y=end_arrow+50)
                     #edit.pack()
 
-                    button1 = tk.Button(master = arrow1_canvas,text = "Edit round", anchor = tk.W, command = lambda r =r: diff_edition(wdw, r, sBox, pBox, numOfRounds, trail, probs, inputString))
+                    button1 = tk.Button(master = arrow1_canvas,text = "Edit round", anchor = tk.W, command = lambda r =r: diff_edition(wdw, r, sBox, pBox, numOfRounds, trail, probs, inputString, svalues))
                     button1_window = arrow1_canvas.create_window(width/3-15, end_arrow+39, anchor=tk.NW, window=button1)
 
 
@@ -485,17 +534,21 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
                     prob_here = 1
                     for i in range(r+1):
                         prob_here = prob_here * probs[i]
-                    prb = Decimal(math.log2(prob_here))
+
+                    if prob_here >0:
+                        prb = Decimal(math.log2(prob_here))
+                    else:
+                        prb = 0
                     #print(prob_here)
                     arrow1_canvas.create_text(19*width/20, end_arrow+50, text=(str(round(prb, 3))))
                     if(prob_fin>0):
                         arrow1_canvas.create_text(width/2, end_arrow+100, text=("An attack would be efficient until round " +str(len(trail)) + " with probability (log2) " + str(math.log2(prob_fin))))
                     else:
-                        arrow1_canvas.create_text(width/2, end_arrow+100, text="No attack is possible with this settings as they are not possible")
+                        arrow1_canvas.create_text(width/2, end_arrow+100, text="No attack is possible with these settings as they are not possible")
                     if(prob_here>0):
                         arrow1_canvas.create_text(width/2, end_arrow+120, text=("The attack complexity in this number of rounds would be 2^" + str(-math.log2(prob_here))))
                     else:
-                        arrow1_canvas.create_text(width/2, end_arrow+120, text="No attack is possible with this settings, so no complexity can be calculated")
+                        arrow1_canvas.create_text(width/2, end_arrow+120, text="No attack is possible with these settings, so no complexity can be calculated")
 
                 if(type == "Linear"):
                     #TODO stop text moving
@@ -519,7 +572,7 @@ def visual(inputString, numOfBits, numOfRounds, sBoxes, sBox, pBox, type, first,
 
                 end_y = (r+1)*end_arrow+200
 
-    arrow1_canvas = tk.Canvas(wdw, yscrollcommand = scrollbar.set, scrollregion=(0,0,(numOfRounds+1)*300, (numOfRounds+1)*300))
+    arrow1_canvas = tk.Canvas(wdw, yscrollcommand = scrollbar.set)
     arrow1_canvas.pack(fill=tk.BOTH, expand = 1)
     arrow1_canvas.configure(scrollregion=arrow1_canvas.bbox("all"))
 
