@@ -7,14 +7,15 @@ class Cryptanalysis:
     num_rounds = 0
     trail = []
     probabilities = []
+    type =""
     input_string = ""
 
     # Initialise the cryptanalysis class
-    def __init__(self, type, sbox, pbox, num_rounds):
+    def __init__(self, sbox, pbox, num_rounds):
         self.sbox = sbox
         self.pbox = pbox
         self.num_rounds = num_rounds
-        print("yhe")
+        print(type)
 
   ######################
   # DIFFERENTIAL CLASS #
@@ -23,6 +24,9 @@ class Cryptanalysis:
 class Differential(Cryptanalysis):
     print("yeh")
     """Class for differential cryptanalysis. This inherits from the cryptanalysis class."""
+
+    # Own variables
+    ddt = [] # Difference Distribution Table
     # Initialise the differential class
     def __init__(self, sbox, pbox, type):
         # Call the super class initialiser
