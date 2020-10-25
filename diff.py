@@ -6,8 +6,6 @@ import tkinter as tk
 
 # Compute the Differential Distribution Table
 def diffDistTable(sbox):
-    # print("Primero")
-    # print(sbox)
     for i in range(len(sbox)):
         sbox[i] = int(sbox[i])
     # print("segundo")
@@ -76,9 +74,6 @@ def diffTrail(sbox, data, ddt, pbox, rounds):
                 general_prob = general_prob * prob
                 trail.append(swapped)
         r = r + 1
-    # print("Useful until round ", len(trail), " with probability ", general_prob)
-    # print("the svalues are ", svalues)
-    # print("trail is ", trail)
     return trail, probabilities, general_prob, svalues
 
 

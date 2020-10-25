@@ -19,16 +19,17 @@ def linApptable(sbox):
                 #  check if they produce the same result
                 if (masked_input == masked_output):
                     lat[row][col] += 1
-    corrolation(lat,size)
+    correlation(lat, size)
     return lat
 
+# Hamming weight
 def parity(i):
     i = i - ((i >> 1) & 0x55555555)
     i = (i & 0x33333333) + ((i >> 2) & 0x33333333)
     i = (((i + (i >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24
     return int(i % 2)
 
-def corrolation(lat,size):
+def correlation(lat,size):
     #  input mask
     for row in range(size):
         #  output mask
