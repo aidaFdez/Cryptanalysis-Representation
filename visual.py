@@ -154,12 +154,9 @@ def diff_edition(wn, round, sbox, pbox, numRounds, tr, pbs, inputString, svalues
             error = ""
 
             # now that we have the new svalues, check that they can match the dfft
-            #print(new_svalue)
-            #print(old_round)
-            #print(old_trail)
             inp_data = diff.getInts(inputString)
             for i in range(len(new_svalue)):
-                # for each of the rows in the ddft, calculate new probability
+                # for each of the rows in the ddft, get new probability
                 np = ddt[old_round[i]][new_svalue[i]]/16
                 if round == 0:
                     np= ddt[inp_data[i]][new_svalue[i]]/16
