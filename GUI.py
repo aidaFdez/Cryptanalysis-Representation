@@ -3,21 +3,63 @@ from tkinter.ttk import *
 import visual
 import sys
 import re
+import numpy as np
+import diff
+import trails
+#from sage.all import *
+
+
+
+if __name__ == "__main__":
+    args = sys.argv
+    if len(args)>1:
+        if args[1] == "present":
+            print("hey")
+
+            pbox = [x%63 for x in (np.arange(64)*16)]
+            pbox[63] = 63
+            print(pbox)
+            inputString = "4004000000000000"
+            visual.visual(inputString, 2, 30, len(inputString), [12, 5, 6, 11, 9, 0, 10, 13, 3, 14, 15, 8, 4, 7, 1, 2], pbox, "Differential", True, [], [], 1, [])
+            exit()
+
+        if args[1] == "check_trail_present":
+            print("Checking trail for PRESENT")
+            sbox = [12, 5, 6, 11, 9, 0, 10, 13, 3, 14, 15, 8, 4, 7, 1, 2]
+
+            #Trail from the
+            pbox = [x % 63 for x in (np.arange(64) * 16)]
+            pbox[63] = 63
+            print(pbox)
+            print(diff.check_trail(trails.trail_diff2, sbox, pbox, False))
+            exit()
+
+        if args[1] == "check_trail_gift":
+            print("Checking trail for GIFT")
+            sbox = [1,10,4,12,6,15,3,9,2,13,11,7,5,0,8,14]
+            pbox = [0,17,34,51,48,1,18,35,32,49,2,19,16,33,50,3,
+                    4,21,38,55,52,5,22,39,36,53,6,23,20,37,54,7,
+                    8,25,42,59,56,9,26,43,40,57,10,27,24,41,58,11,
+                    12,29,46,63,60,13,30,47,44,61,14,31,28,45,62,15]
+            visual.visual("0000000000001010", 2, 30, 16, sbox,
+                          pbox, "Differential", True, [], [], 1, [])
+            print(diff.check_trail(trails.trail_gift1, sbox, pbox, True))
+            exit()
 
 
 root =Tk()
 root.title("Cryptanalysis")
-root.geometry("1000x370")
+root.geometry("1000x500")
 
 def update_scrollregion(event):
     wdw.configure(scrollregion=window.bbox("all"))
 
-photoFrame = Frame(root, width=1550, height=400)
+photoFrame = Frame(root, width=1550, height=500)
 photoFrame.grid()
 photoFrame.rowconfigure(0, weight=1)
 photoFrame.columnconfigure(0, weight=1)
 
-wdw = Canvas(photoFrame, height=340, width = 1000 )
+wdw = Canvas(photoFrame, height=500, width = 1000 )
 wdw.grid(row=0, column=0, sticky="nsew")
 
 window = Frame(wdw,width=1550, height=400 )
@@ -29,6 +71,8 @@ wdw.config(xscrollcommand=photoScroll.set)
 photoScroll.grid(row=1, column=0, sticky="we")
 
 window.bind("<Configure>", update_scrollregion)
+
+
 
 #GUI for choosing the kind of cryptanalysis
 messKind = Label(window, text="Choose type of attack")
@@ -123,7 +167,14 @@ def creatediff():
     sBox = [6,4,12,5,0,7,2,14,1,15,3,13,8,10,9,11]
     pBox =[0,4,8,12,1,5,9,13,2,6,10,14,3,7,11, 15]
     #pBox = [0,1,2,3,4,5,6,7,8,9,10,11]
-    visual.visual("000f", 2, 5,len("000f") , sBox, pBox, "Differential", True, [],[],1, [])
+
+    pbox = [x % 63 for x in (np.arange(64) * 16)]
+    pbox[63] = 63
+    print(pbox)
+    inputString = "0700000000000700"
+    visual.visual(inputString, 2, 30, len(inputString), [12, 5, 6, 11, 9, 0, 10, 13, 3, 14, 15, 8, 4, 7, 1, 2], pbox,
+                  "Differential", True, [], [], 1, [])
+    #visual.visual("000f", 2, 5,len("000f") , sBox, pBox, "Differential", True, [],[],1, [])
     #exit()
 def createlin():
     sBox = [15,14,11,12,6,13,7,8,0,3,9,10,4,2,1,5]
@@ -163,7 +214,7 @@ def create():
        popupmsg("The number of P-boxes has to be the same size as the S-box for a linear cryptanalysis")
        return
     #Get the pBox
-    send = []
+    pbox = []
     for en in pBox:
         #checks to correct values
         if(en.get() == ""):
@@ -172,10 +223,10 @@ def create():
         if (int(en.get()) < 0 or int(en.get()) > 4*int(boxes.get())):
            popupmsg("pbox values out of range, these must be from 0 to " + str(4*int(boxes.get())))
            return
-        if (int(en.get()) in send):
+        if (int(en.get()) in pbox):
             popupmsg("Repeated pbox values")
             return
-        send.append(int(en.get()))
+        pbox.append(int(en.get()))
 
     #Get the sbox
     sbox = []
@@ -193,9 +244,9 @@ def create():
         sbox.append(int(en.get()))
 
     if(type.get() == "Linear") :
-        visual.visual(inputString, 2, rounds.get(), int(len(inputString)/4), sbox, send, type.get(), True, [],[],1, [])
+        visual.visual(inputString, 2, rounds.get(), int(len(inputString)/4), sbox, pbox, type.get(), True, [],[],1, [])
     if(type.get() == "Differential") :
-        visual.visual(inputString, 2, rounds.get(), len(inputString), sbox, send, type.get(), True, [],[],1, [])
+        visual.visual(inputString, 2, rounds.get(), len(inputString), sbox, pbox, type.get(), True, [],[],1, [])
 
 generateButton = Button(window, text = "Generate", command = create)
 generateButton.grid(row = 16, column = 0)
@@ -206,4 +257,90 @@ generateDifferential.grid(row = 17, column = 0)
 generateLinear = Button(window, text = "Default Linear Trail", command = createlin)
 generateLinear.grid(row = 18, column = 0)
 
+
+
+def show_trail_present():
+    sbox = [12, 5, 6, 11, 9, 0, 10, 13, 3, 14, 15, 8, 4, 7, 1, 2]
+
+    # Trail from the
+    pbox = [x % 63 for x in (np.arange(64) * 16)]
+    pbox[63] = 63
+    print(pbox)
+    visual.visual("0000000000000011", 2, 30, 16, sbox,
+                  pbox, "Differential", True, [], [], 1, [])
+    exit()
+
+def show_trail_gift():
+    sbox = [1, 10, 4, 12, 6, 15, 3, 9, 2, 13, 11, 7, 5, 0, 8, 14]
+    pbox = [0, 17, 34, 51, 48, 1, 18, 35, 32, 49, 2, 19, 16, 33, 50, 3,
+            4, 21, 38, 55, 52, 5, 22, 39, 36, 53, 6, 23, 20, 37, 54, 7,
+            8, 25, 42, 59, 56, 9, 26, 43, 40, 57, 10, 27, 24, 41, 58, 11,
+            12, 29, 46, 63, 60, 13, 30, 47, 44, 61, 14, 31, 28, 45, 62, 15]
+
+    visual.visual("0000000000001010", 2, 30, 16, sbox,
+                  pbox, "Differential", True, [], [], 1, [])
+
+    exit()
+
+def default_diff_trail():
+    print("Checking trail for PRESENT")
+    popup = Tk()
+    popup.wm_title("PRESENT trail")
+    sbox = [12, 5, 6, 11, 9, 0, 10, 13, 3, 14, 15, 8, 4, 7, 1, 2]
+    # Trail from the
+    pbox = [x % 63 for x in (np.arange(64) * 16)]
+    pbox[63] = 63
+    print(pbox)
+    pr = diff.check_trail(trails.trail_diff2, sbox, pbox, False)
+    message = "This trail is not possible"
+    if not pr == 0:
+        message = "The probability of this trail is " + str(pr)
+    label = Label(popup, text=str(message))
+    label.pack()
+
+    print("*************************************"+str(pr))
+    B1 = Button(popup, text="Okay", command=popup.destroy)
+    B1.pack()
+    B2 = Button(popup, text="Visualise", command=show_trail_present)
+    B2.pack()
+    #visual.visual("0000000000000011", 2, 30, 16, sbox,
+    #              pbox, "Differential", True, [], [], 1, [])
+    popup.mainloop()
+    exit()
+
+def check_diff_trail():
+    print("Checking trail for GIFT")
+    popup = Tk()
+    popup.wm_title("GIFT trail")
+    sbox = [1, 10, 4, 12, 6, 15, 3, 9, 2, 13, 11, 7, 5, 0, 8, 14]
+    pbox = [0, 17, 34, 51, 48, 1, 18, 35, 32, 49, 2, 19, 16, 33, 50, 3,
+            4, 21, 38, 55, 52, 5, 22, 39, 36, 53, 6, 23, 20, 37, 54, 7,
+            8, 25, 42, 59, 56, 9, 26, 43, 40, 57, 10, 27, 24, 41, 58, 11,
+            12, 29, 46, 63, 60, 13, 30, 47, 44, 61, 14, 31, 28, 45, 62, 15]
+
+    pr = diff.check_trail(trails.trail_gift1, sbox, pbox, True)
+
+    message = "This trail is not possible"
+    if not pr == 0:
+        message = "The probability of this trail is " + str(pr)
+    label = Label(popup, text=str(message))
+    label.pack()
+    print("*************************************"+str(pr))
+    B1 = Button(popup, text="Okay", command=popup.destroy)
+    B1.pack()
+    B2 = Button(popup, text="Visualise", command=show_trail_gift)
+    B2.pack()
+
+    popup.mainloop()
+    exit()
+
+
+
+default_diff_trail_button = Button(window, text = "Default GIFT/PRESENT trail", command  = default_diff_trail)
+default_diff_trail_button.grid(row=20, column=0)
+
+check_diff_trail_button = Button(window, text = "Input differential trail", command  = check_diff_trail)
+check_diff_trail_button.grid(row=19, column=0)
+
 root.mainloop()
+

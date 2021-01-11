@@ -2,7 +2,8 @@
 import re
 import sys
 import tkinter as tk
-
+import diff
+import math
 
 # Compute the Differential Distribution Table
 def diffDistTable(sbox):
@@ -60,6 +61,7 @@ def diffTrail(sbox, data, ddt, pbox, rounds):
         else:
             #vals = []
             prob = 1
+            print(trail)
             # Same as before, but taking the previous ones as base
             vals, prob = doSbox(trail[r-1], prob, ddt)
             # add the vals to the svalues, so to have the values of each s box
@@ -68,7 +70,7 @@ def diffTrail(sbox, data, ddt, pbox, rounds):
             # print("values are ", vals)
             # Save the probability of this round
             probabilities.append(prob)
-            if (general_prob * prob <= 2 ** (-16)):
+            if (general_prob * prob <= 2 ** (-64)):
                 over_prob = True
             else:
                 general_prob = general_prob * prob
@@ -240,6 +242,49 @@ def fromBinary(c):
     if (c == [1, 1, 1, 1]): return [15]
 
 
+def opp_fromBinary(c):
+    # print(c)
+    if (c == [0, 0, 0, 0]): return [0]
+    if (c == [0, 0, 0, 1]): return [1]
+    if (c == [0, 0, 1, 0]): return [2]
+    if (c == [0, 0, 1, 1]): return [3]
+    if (c == [0, 1, 0, 0]): return [4]
+    if (c == [0, 1, 0, 1]): return [5]
+    if (c == [0, 1, 1, 0]): return [6]
+    if (c == [0, 1, 1, 1]): return [7]
+    if (c == [1, 0, 0, 0]): return [8]
+    if (c == [1, 0, 0, 1]): return [9]
+    if (c == [1, 0, 1, 0]): return [10]
+    if (c == [1, 0, 1, 1]): return [11]
+    if (c == [1, 1, 0, 0]): return [12]
+    if (c == [1, 1, 0, 1]): return [13]
+    if (c == [1, 1, 1, 0]): return [14]
+    if (c == [1, 1, 1, 1]): return [15]
+
+
+def opp_getBinary(c):
+    #print(c, " is the received")
+    a=[]
+    if (c == 0): a= [0, 0, 0, 0]
+    if (c == 1): a= [1, 0, 0, 0]
+    if (c == 2): a= [0, 1, 0, 0]
+    if (c == 3): a= [1, 1, 0, 0]
+    if (c == 4): a= [0, 0, 1, 0]
+    if (c == 5): a= [1, 0, 1, 0]
+    if (c == 6): a= [0, 1, 1, 0]
+    if (c == 7): a= [1, 1, 1, 0]
+    if (c == 8): a= [0, 0, 0, 1]
+    if (c == 9): a= [1, 0, 0, 1]
+    if (c == 10 or c == 'A'): a= [0, 1, 0, 1]
+    if (c == 11 or c == 'B'): a= [1, 1, 0, 1]
+    if (c == 12 or c == 'C'): a= [0, 0, 1, 1]
+    if (c == 13 or c == 'D'): a= [1, 0, 1, 1]
+    if (c == 14 or c == 'E'): a= [0, 1, 1, 1]
+    if (c == 15 or c == 'F'): a= [1, 1, 1, 1]
+    a.reverse()
+    return a
+
+
 def vals_string(vals):
     # print("********************************")
     # print(vals)
@@ -269,6 +314,75 @@ def popup(title, msg):
     button.wait_variable(var)
     # print("done waiting.")
 # ("You chose " + str(numOfRounds) + " but it is efficient to calculate up to " + str(len(trail)) + ", so this was used")
+
+# Check the differential trail and get the probability of it.
+def check_trail(tr, sbox, pbox, lst_right):
+    ddt = diffDistTable(sbox)
+    error = ""
+    new_prob = 1
+    # Check for each round the probability of going to the next one
+    for index, s_value in enumerate(tr):
+        print(index, ":", s_value)
+        if index >= 1:
+            new_bin = []
+            new_round = tr[index]
+
+            # print("\tThe round is: ", new_round)
+
+            # Get the binary to undo the permutation
+            for c in new_round:
+                # print(c)
+                if lst_right:
+                    new_bin.extend(diff.opp_getBinary(c))
+                else:
+                    new_bin.extend(diff.getBinary(c))
+            # print("\tBinary of round: ", new_bin)
+
+            # binary result of undoing the pbox
+            undone_binary = [0] * len(pbox)
+            # print(new_bin)
+            for i in range(len(pbox)):
+                # print(pbox.index(i))
+                # print(new_bin[i])
+                undone_binary[pbox.index(i)] = new_bin[i]
+            # get the int values of the undone
+            new_svalue = []
+            for i in range(int(len(pbox) / 4)):
+                interm = [undone_binary[i * 4], undone_binary[i * 4 + 1], undone_binary[i * 4 + 2],
+                          undone_binary[i * 4 + 3]]
+                if lst_right:
+                    new_svalue.extend(diff.opp_fromBinary(interm))
+                else:
+                    new_svalue.extend(diff.fromBinary(interm))
+            error = ""
+            print("\tUndone binary: ", undone_binary)
+            print("\tUndone: ", new_svalue)
+
+            # now that we have the new svalues, check that they can match the dfft
+            inp_data = tr[index]
+            old_round = tr[index-1]
+            r_prob = 1
+            for i in range(len(new_svalue)):
+                # for each of the rows in the ddft, get new probability
+                np = ddt[old_round[i]][new_svalue[i]] / 16
+                # print("\tGoing from ", new_svalue[i], "to ", old_round[i], "with probability ", np)
+                new_prob = new_prob * np
+                r_prob = r_prob*np
+
+                # if the new probability is 0, then add it to the error string
+                # print(ddt[old_round[i]][new_svalue[i]])
+                if np <= 0:
+                    error = error + str(
+                        "Not possible to go from " + str(new_svalue[i]) + " to " + str(old_round[i]) + "\n")
+                    print(error)
+                    error = ""
+            # print(error)
+            if r_prob > 0:
+                print("\tProbability: ", math.log(r_prob, 2))
+            # print("\n")
+
+    print(error)
+    return math.log(new_prob, 2)
 
 # TODO boton de cambiar, cambios simples,
 # Hecho mirar las flechas,Log 2, complejidad (opuesto probabilidad) seria nº textos elegidos necesarios, total probabilidad acumulada
