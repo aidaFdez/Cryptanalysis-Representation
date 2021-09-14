@@ -43,17 +43,21 @@ def diffTrail(sbox, data, ddt, pbox, rounds):
         # for r in range(rounds):
         # print("In round ", r)
         # If it is the first round, do it from the input
+        # print("r is", r)
         if r == 0:
             prob = 1
             #trail.append(getInts(data))
+            #print(data)
             vals, prob = doSbox(getInts(data), prob, ddt)
 
             # add the vals to the svalues, so to have the values of each s box
             svalues.append(vals)
+            # print("values",vals)
             # Need to apply the permutation to the values:
             swapped = pBoxSwaps(pbox, vals)
             # print(swapped, " Values after swapping")
             trail.append(swapped)
+            print(swapped)
             # Save the probability of this round
             probabilities.append(prob)
             general_prob = general_prob * prob
@@ -61,7 +65,7 @@ def diffTrail(sbox, data, ddt, pbox, rounds):
         else:
             #vals = []
             prob = 1
-            print(trail)
+            # print(trail)
             # Same as before, but taking the previous ones as base
             vals, prob = doSbox(trail[r-1], prob, ddt)
             # add the vals to the svalues, so to have the values of each s box
@@ -83,6 +87,7 @@ def diffTrail(sbox, data, ddt, pbox, rounds):
 def pBoxSwaps(pBox, input):
     # print("************Entered PBOX*********")
     output = []
+    # print("pbox is", pBox)
     # Get the binary values of the input difference
     for ch in input:
         output.extend(getBinary(ch))
@@ -95,7 +100,9 @@ def pBoxSwaps(pBox, input):
         bin_output[pBox[n]] = output[n]
     new_diff = []
     # That division should be the number of bits of the thingy
+    # print(input)
     for r in range(len(input)):
+        # print(r)
         num = []
         num.append(bin_output[r * 4])
         num.append(bin_output[r * 4 + 1])
@@ -382,7 +389,10 @@ def check_trail(tr, sbox, pbox, lst_right):
             # print("\n")
 
     print(error)
-    return math.log(new_prob, 2)
+    if new_prob == 0:
+        return 0
+    else:
+        return math.log(new_prob, 2)
 
 # TODO boton de cambiar, cambios simples,
 # Hecho mirar las flechas,Log 2, complejidad (opuesto probabilidad) seria nº textos elegidos necesarios, total probabilidad acumulada
